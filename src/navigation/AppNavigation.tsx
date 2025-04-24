@@ -2,6 +2,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from '../screens/Home';
 import RootStackParamList from '../types/rootStackNavigator';
 import Login from '../screens/Login';
+import Register from '../screens/Register';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -21,6 +22,13 @@ const Navigation = () => {
         }}
         name="Login"
         component={Login}
+      />
+      <RootStack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="SignUp"
+        component={Register}
       />
     </RootStack.Navigator>
   );

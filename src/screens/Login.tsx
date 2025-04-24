@@ -10,8 +10,12 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import loginBg from '../assets/login-bg.png';
 import Icon from '@react-native-vector-icons/ionicons';
 import PasswordInput from '../components/PasswordInput';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import RootStackParamList from '../types/rootStackNavigator';
 
-const Login = () => {
+type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+
+const Login = ({navigation}: LoginProps) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
@@ -40,7 +44,7 @@ const Login = () => {
             Login your account.
           </Text>
 
-          <View className="gap-y-4">
+          <View className="gap-y-2">
             <View className="gap-y-2">
               <Text className="text-slate-700">Email</Text>
               <View className="flex flex-row items-center gap-x-2 border rounded border-slate-300 px-2 ">
@@ -76,7 +80,7 @@ const Login = () => {
 
             <TouchableOpacity
               onPress={handleSubmit}
-              className="bg-[#5A0FC8] py-2.5 px-9 rounded-sm ">
+              className="bg-[#7F45D4] py-2.5 px-9 rounded-sm ">
               <Text className="text-white text-center">Login</Text>
             </TouchableOpacity>
           </View>
@@ -86,7 +90,12 @@ const Login = () => {
         <View>
           <Text className="text-slate-700 text-center">
             New User?
-            <Text className="text-[#5A0FC8]"> Register</Text>
+            <Text
+              onPress={() => navigation.navigate('SignUp')}
+              className="text-[#5A0FC8]">
+              {' '}
+              Register
+            </Text>
           </Text>
         </View>
       </View>
