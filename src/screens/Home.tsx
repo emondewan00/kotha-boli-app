@@ -4,21 +4,36 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import user from '../assets/user.png';
 import SearchBar from '../components/SearchBar';
 import Separator from '../components/Separator';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import TabNavigatorParamList from '../types/tabNavigator';
+import {CompositeScreenProps} from '@react-navigation/native';
+import RootStackParamList from '../types/rootStackNavigator';
 
-const Home = () => {
+type HomeParamList = CompositeScreenProps<
+  NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+const Home = ({navigation}: HomeParamList) => {
   return (
     <SafeAreaView className="bg-white flex-1">
       <SearchBar />
       <FlatList
         data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
         keyExtractor={item => item.toString()}
-        contentContainerClassName="gap-y-1 by-20 "
+        contentContainerClassName="gap-y-1 by-20 px-5"
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={Separator}
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         renderItem={({item, index}) => {
           return (
-            <Pressable key={index} className="flex flex-row gap-x-2 py-4 px-5">
+            <Pressable
+              onPress={() =>
+                navigation.navigate('Chat', {
+                  chatId: item.toString(),
+                })
+              }
+              key={index}
+              className="flex flex-row gap-x-2 py-4">
               <Image
                 source={user}
                 className="h-13 w-13 rounded-full my-auto"

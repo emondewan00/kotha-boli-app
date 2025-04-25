@@ -3,6 +3,7 @@ import RootStackParamList from '../types/rootStackNavigator';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 import TabNavigator from './TabNavigator';
+import Chat from '../screens/Chat';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -29,6 +30,13 @@ const Navigation = () => {
         }}
         name="SignUp"
         component={Register}
+      />
+      <RootStack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="Chat"
+        component={Chat}
       />
     </RootStack.Navigator>
   );
