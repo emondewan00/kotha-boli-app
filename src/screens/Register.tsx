@@ -48,7 +48,7 @@ const Register = ({navigation}: RegisterProps) => {
               <TextInput
                 value={name}
                 onChangeText={setName}
-                className=" py-2.5 text-slate-700  border rounded border-slate-300 px-2  "
+                className=" py-2.5 text-slate-700  border rounded border-slate-300 px-2 grow"
                 placeholder="Enter your name"
               />
             </View>
@@ -60,7 +60,7 @@ const Register = ({navigation}: RegisterProps) => {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  className="rounded-sm py-2.5 text-slate-700 pr-6"
+                  className="rounded-sm py-2.5 text-slate-700 pr-6 grow"
                   placeholder="Enter your email"
                 />
               </View>

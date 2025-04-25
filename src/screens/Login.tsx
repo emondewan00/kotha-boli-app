@@ -59,7 +59,7 @@ const Login = ({navigation}: LoginProps) => {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  className=" rounded-sm py-2.5 text-slate-700 pr-6"
+                  className=" rounded-sm py-2.5 text-slate-700 pr-6 grow"
                   placeholder="Enter your email"
                 />
               </View>

@@ -1,7 +1,7 @@
 type RootStackParamList = {
-  Home: undefined;
   Login: undefined;
   SignUp: undefined;
+  TabNavigator: undefined;
 };
 
 export default RootStackParamList;

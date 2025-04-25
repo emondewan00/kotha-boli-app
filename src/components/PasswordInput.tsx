@@ -59,7 +59,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         </TouchableOpacity>
         <TextInput
           style={inputStyle}
-          className="flex-1 py-2.5 text-slate-700"
+          className="flex-1 py-2.5 text-slate-700 grow"
           placeholder={placeholder}
           placeholderTextColor={iconColor}
           secureTextEntry={!showPassword}
