@@ -114,7 +114,8 @@ const Chat = ({navigation}: ChatParamList) => {
           <Icon name="happy-outline" size={26} color={'#334155'} />
           <TextInput
             placeholder="Type message here..."
-            className=" py-4 grow"
+            className=" py-4 grow text-slate-700"
+            placeholderTextColor="gray"
           />
           <Pressable className="bg-[#5A0FC8] rounded-full p-2.5">
             <Icon name="paper-plane-outline" size={20} color={'white'} />

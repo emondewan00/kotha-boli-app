@@ -10,7 +10,11 @@ const SearchBar = () => {
       </Text>
       <View className="flex flex-row bg-white rounded-full items-center px-3  gap-x-4 mt-2">
         <Icon name="search" size={20} color="gray" />
-        <TextInput placeholder="Search" className="py-4 grow " />
+        <TextInput
+          placeholder="Search"
+          className="py-4 grow text-slate-700"
+          placeholderTextColor={'gray'}
+        />
       </View>
     </View>
   );

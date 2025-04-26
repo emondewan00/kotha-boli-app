@@ -3,6 +3,7 @@ import RootStackParamList from './rootStackNavigator';
 
 type TabNavigatorParamList = {
   Home: NavigatorScreenParams<RootStackParamList>;
+  Profile: undefined;
 };
 
 export default TabNavigatorParamList;
