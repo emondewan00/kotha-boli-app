@@ -8,6 +8,14 @@ type TabButtonProps = BottomTabBarButtonProps & {
   icon: 'chatbox-outline' | 'person-outline';
 };
 
+const iconName: Record<
+  'chatbox-outline' | 'person-outline',
+  'chatbox' | 'person'
+> = {
+  'chatbox-outline': 'chatbox',
+  'person-outline': 'person',
+};
+
 const TabButton: React.FC<TabButtonProps> = ({
   icon,
   title,
@@ -19,7 +27,7 @@ const TabButton: React.FC<TabButtonProps> = ({
       onPress={onPress}
       className="justify-center items-center flex-1 ">
       <Icon
-        name={icon}
+        name={accessibilityState?.selected ? iconName[icon] : icon}
         color={accessibilityState?.selected ? '#7B3FD3' : 'gray'}
         size={18}
       />
