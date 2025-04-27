@@ -1,10 +1,11 @@
-import {View, Text, FlatList, Image, TextInput, Pressable} from 'react-native';
+import {View, Text, FlatList, Image, Pressable} from 'react-native';
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from '@react-native-vector-icons/ionicons';
 import userPhoto from '../assets/user.png';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import RootStackParamList from '../types/rootStackNavigator';
+import ChatInput from '../components/ChatInput';
 
 type ChatParamList = NativeStackScreenProps<RootStackParamList, 'Chat'>;
 
@@ -22,6 +23,14 @@ const Chat = ({navigation}: ChatParamList) => {
     {
       id: 2,
       message: 'Hello',
+      user: {
+        name: 'Emon Hossain',
+        email: 'hossain@gmail.com',
+      },
+    },
+    {
+      id: 3,
+      message: 'Test',
       user: {
         name: 'Emon Hossain',
         email: 'hossain@gmail.com',
@@ -58,13 +67,15 @@ const Chat = ({navigation}: ChatParamList) => {
       <FlatList
         data={data}
         contentContainerClassName="bg-white flex-1 rounded-t-[40px] py-8 px-4 gap-y-6"
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
+          const isProfileShow = data[index + 1]?.user.email !== item.user.email;
+
           return (
             <View
               className={`flex  gap-x-2 ${
                 item.user.email === user ? 'flex-row' : 'flex-row-reverse'
               }`}>
-              <View className="grow w-[80%]">
+              <View className={`grow w-[80%] ${isProfileShow ? '' : 'ml-12'}`}>
                 <Text
                   className={`text-white rounded-3xl p-3  ${
                     item.user.email === user ? 'bg-[#7B3FD3]' : 'bg-[#AD87E4]'
@@ -84,44 +95,20 @@ const Chat = ({navigation}: ChatParamList) => {
                   10 min
                 </Text>
               </View>
-              <Image
-                source={userPhoto}
-                resizeMode="cover"
-                className="h-12 rounded-full w-12"
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{marginTop: 'auto'}}
-              />
+              {isProfileShow && (
+                <Image
+                  source={userPhoto}
+                  resizeMode="cover"
+                  className="h-12 rounded-full w-12"
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  style={{marginTop: 'auto'}}
+                />
+              )}
             </View>
           );
         }}
       />
-      <View className=" p-4 bg-white">
-        <View
-          className="shadow-2xl rounded-full flex flex-row bg-white items-center gap-x-4"
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            paddingLeft: 8,
-            paddingRight: 6,
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 0,
-              height: 5,
-            },
-            shadowOpacity: 1,
-            shadowRadius: 3.84,
-            elevation: 10,
-          }}>
-          <Icon name="happy-outline" size={26} color={'#334155'} />
-          <TextInput
-            placeholder="Type message here..."
-            className=" py-4 grow text-slate-700"
-            placeholderTextColor="gray"
-          />
-          <Pressable className="bg-[#5A0FC8] rounded-full p-2.5">
-            <Icon name="paper-plane-outline" size={20} color={'white'} />
-          </Pressable>
-        </View>
-      </View>
+      {<ChatInput />}
     </SafeAreaView>
   );
 };

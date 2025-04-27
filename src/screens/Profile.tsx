@@ -1,15 +1,17 @@
-import {View, Text, Image, FlatList} from 'react-native';
+import {View, Text, Image} from 'react-native';
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import profile from '../assets/user.png';
 import Icon from '@react-native-vector-icons/ant-design';
-import Separator from '../components/Separator';
+import NavigationComponent from '../components/NavigationComponent';
 
-const data: Array<{
+export type NavigationItem = {
   id: number;
   icon: 'edit' | 'setting' | 'question-circle' | 'logout' | 'lock' | 'mail';
   title: string;
-}> = [
+};
+
+const data: Array<NavigationItem> = [
   {
     id: 1,
     icon: 'edit',
@@ -72,33 +74,9 @@ const Profile = () => {
             height: 2,
           },
         }}>
-        <FlatList
-          data={data}
-          renderItem={({item}) => (
-            <View className="flex-row justify-between items-center py-5">
-              <View className="flex-row items-center gap-x-3">
-                <Icon
-                  name={item.icon}
-                  color={`${item.icon === 'logout' ? '#ef4444' : '#7B3FD3'}`}
-                  size={20}
-                />
-                <Text
-                  className={`text-lg ${
-                    item.icon === 'logout' ? 'text-red-500' : 'text-slate-700'
-                  }`}>
-                  {item.title}
-                </Text>
-              </View>
-              <Icon
-                name="arrow-right"
-                color={`${item.icon === 'logout' ? '#ef4444' : '#d1d5db'}`}
-                size={20}
-              />
-            </View>
-          )}
-          // eslint-disable-next-line react/no-unstable-nested-components
-          ItemSeparatorComponent={() => <Separator color="#f3f4f6" />}
-        />
+        {data.map(item => (
+          <NavigationComponent {...item} />
+        ))}
       </View>
     </SafeAreaView>
   );
