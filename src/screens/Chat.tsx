@@ -66,7 +66,7 @@ const Chat = ({navigation}: ChatParamList) => {
       </View>
       <FlatList
         data={data}
-        contentContainerClassName="bg-white flex-1 rounded-t-[40px] py-8 px-4 gap-y-6"
+        contentContainerClassName="bg-white flex-1 rounded-t-[40px] py-8 px-4"
         renderItem={({item, index}) => {
           const isProfileShow = data[index + 1]?.user.email !== item.user.email;
 
@@ -74,7 +74,7 @@ const Chat = ({navigation}: ChatParamList) => {
             <View
               className={`flex  gap-x-2 ${
                 item.user.email === user ? 'flex-row' : 'flex-row-reverse'
-              }`}>
+              } ${isProfileShow ? '' : 'mt-4'}`}>
               <View className={`grow w-[80%] ${isProfileShow ? '' : 'ml-12'}`}>
                 <Text
                   className={`text-white rounded-3xl p-3  ${

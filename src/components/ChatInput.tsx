@@ -4,7 +4,7 @@ import Icon from '@react-native-vector-icons/ionicons';
 
 const ChatInput = () => {
   return (
-    <View className=" p-4 bg-white">
+    <View className=" p-4 bg-white" >
       <View
         className="shadow-2xl rounded-full flex flex-row bg-white items-center gap-x-4"
         // eslint-disable-next-line react-native/no-inline-styles

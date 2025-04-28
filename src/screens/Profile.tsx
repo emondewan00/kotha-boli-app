@@ -75,7 +75,7 @@ const Profile = () => {
           },
         }}>
         {data.map(item => (
-          <NavigationComponent {...item} />
+          <NavigationComponent {...item} key={item.id} />
         ))}
       </View>
     </SafeAreaView>
