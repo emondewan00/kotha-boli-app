@@ -12,9 +12,9 @@ import loginBg from '../assets/login-bg.png';
 import Icon from '@react-native-vector-icons/ionicons';
 import PasswordInput from '../components/PasswordInput';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import RootStackParamList from '../types/rootStackNavigator';
+import AuthNavigatorParamList from '../types/authNavigator';
 
-type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type LoginProps = NativeStackScreenProps<AuthNavigatorParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
   const [password, setPassword] = useState('');
@@ -90,7 +90,7 @@ const Login = ({navigation}: LoginProps) => {
             </View>
           </View>
         </View>
-        <View className="flex-1  justify-end mb-10">
+        <View className="mt-1">
           <View>
             <Text className="text-slate-700 text-center">
               New User?
@@ -98,7 +98,7 @@ const Login = ({navigation}: LoginProps) => {
                 onPress={() => navigation.navigate('SignUp')}
                 className="text-[#5A0FC8]">
                 {' '}
-                Register
+                Register.
               </Text>
             </Text>
           </View>

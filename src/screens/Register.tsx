@@ -10,10 +10,10 @@ import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import loginBg from '../assets/login-bg.png';
 import PasswordInput from '../components/PasswordInput';
-import RootStackParamList from '../types/rootStackNavigator';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import AuthNavigatorParamList from '../types/authNavigator';
 
-type RegisterProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
+type RegisterProps = NativeStackScreenProps<AuthNavigatorParamList, 'SignUp'>;
 
 const Register = ({navigation}: RegisterProps) => {
   const [password, setPassword] = useState('');
@@ -24,6 +24,7 @@ const Register = ({navigation}: RegisterProps) => {
     console.log('Name:', name);
     console.log('Email:', email);
     console.log('Password:', password);
+    // navigation.navigate("")
   };
 
   return (

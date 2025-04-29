@@ -1,45 +1,29 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import RootStackParamList from '../types/rootStackNavigator';
-import Login from '../screens/Login';
-import Register from '../screens/Register';
 import TabNavigator from './TabNavigator';
 import Chat from '../screens/Chat';
+import AppNavigatorParamList from '../types/appNavigator';
 
-const RootStack = createNativeStackNavigator<RootStackParamList>();
+const AppStack = createNativeStackNavigator<AppNavigatorParamList>();
 
-const Navigation = () => {
+const AppNavigator = () => {
   return (
-    <RootStack.Navigator initialRouteName="TabNavigator">
-      <RootStack.Screen
+    <AppStack.Navigator>
+      <AppStack.Screen
         options={{
           headerShown: false,
         }}
         name="TabNavigator"
         component={TabNavigator}
       />
-      <RootStack.Screen
-        options={{
-          headerShown: false,
-        }}
-        name="Login"
-        component={Login}
-      />
-      <RootStack.Screen
-        options={{
-          headerShown: false,
-        }}
-        name="SignUp"
-        component={Register}
-      />
-      <RootStack.Screen
+      <AppStack.Screen
         options={{
           headerShown: false,
         }}
         name="Chat"
         component={Chat}
       />
-    </RootStack.Navigator>
+    </AppStack.Navigator>
   );
 };
 
-export default Navigation;
+export default AppNavigator;
