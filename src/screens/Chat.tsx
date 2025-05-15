@@ -1,15 +1,24 @@
 import {View, Text, FlatList, Image, Pressable} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from '@react-native-vector-icons/ionicons';
 import userPhoto from '../assets/user.png';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import RootStackParamList from '../types/rootStackNavigator';
 import ChatInput from '../components/ChatInput';
+import {socket} from '../utils/socket';
+import AppNavigatorParamList from '../types/appNavigator';
 
-type ChatParamList = NativeStackScreenProps<RootStackParamList, 'Chat'>;
+type ChatParamList = NativeStackScreenProps<AppNavigatorParamList, 'Chat'>;
 
 const Chat = ({navigation}: ChatParamList) => {
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('connected');
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
   const user = 'emon@gmail.com';
   const data = [
     {
@@ -108,7 +117,7 @@ const Chat = ({navigation}: ChatParamList) => {
           );
         }}
       />
-      {<ChatInput />}
+      <ChatInput />
     </SafeAreaView>
   );
 };

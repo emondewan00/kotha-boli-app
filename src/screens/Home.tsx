@@ -7,11 +7,11 @@ import Separator from '../components/Separator';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import TabNavigatorParamList from '../types/tabNavigator';
 import {CompositeScreenProps} from '@react-navigation/native';
-import RootStackParamList from '../types/rootStackNavigator';
+import AppNavigatorParamList from '../types/appNavigator';
 
 type HomeParamList = CompositeScreenProps<
   NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
-  NativeStackScreenProps<RootStackParamList>
+  NativeStackScreenProps<AppNavigatorParamList>
 >;
 
 const Home = ({navigation}: HomeParamList) => {
