@@ -5,10 +5,14 @@ interface LoginRequest {
   password: string;
 }
 
+interface RegisterRequest extends LoginRequest {
+  name: string;
+}
+
 type LoginResponse = {
   status: string;
   message: string;
-  token: string;
+  token?: string;
   user?: {
     _id: string;
     email: string;
@@ -25,7 +29,14 @@ export const userApi = baseApi.injectEndpoints({
         body: credentials,
       }),
     }),
+    register: builder.mutation<LoginResponse, RegisterRequest>({
+      query: credentials => ({
+        url: '/register',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
   }),
 });
 
-export const {useLoginMutation} = userApi;
+export const {useLoginMutation, useRegisterMutation} = userApi;

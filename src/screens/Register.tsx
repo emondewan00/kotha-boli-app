@@ -12,6 +12,10 @@ import loginBg from '../assets/login-bg.png';
 import PasswordInput from '../components/PasswordInput';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AuthNavigatorParamList from '../types/authNavigator';
+import {useRegisterMutation} from '../api/userApi';
+import {loginSuccess} from '../features/authSlice';
+import {useAppDispatch} from '../hooks/redux';
+import {setItem} from '../utils/storage';
 
 type RegisterProps = NativeStackScreenProps<AuthNavigatorParamList, 'SignUp'>;
 
@@ -19,12 +23,20 @@ const Register = ({navigation}: RegisterProps) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [register] = useRegisterMutation();
+  const dispatch = useAppDispatch();
 
-  const handleSubmit = () => {
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // navigation.navigate("")
+  const handleSubmit = async () => {
+    const {data, error} = await register({email, password, name});
+    console.log('hello', error, data);
+
+    if (data?.status === 'success') {
+      dispatch(loginSuccess({token: data.token, user: data.user}));
+      setItem('token', data.token as string);
+      setItem('user', JSON.stringify(data.user));
+    } else {
+      console.log(data, error);
+    }
   };
 
   return (

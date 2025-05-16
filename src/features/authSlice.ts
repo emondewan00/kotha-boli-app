@@ -1,5 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {getItem} from '../utils/storage';
+import {getItem, removeItem, setItem} from '../utils/storage';
 
 type User = {
   _id: string;
@@ -24,10 +24,14 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.token = action.payload.token;
       state.user = action.payload.user;
+      setItem('token', action.payload.token as string);
+      setItem('user', JSON.stringify(action.payload.user));
     },
     logout: state => {
       state.token = null;
       state.user = null;
+      removeItem('token');
+      removeItem('user');
     },
   },
 });

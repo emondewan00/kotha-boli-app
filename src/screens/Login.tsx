@@ -28,7 +28,7 @@ const Login = ({navigation}: LoginProps) => {
   const handleSubmit = async () => {
     const {data, error} = await login({email, password});
     if (data?.status === 'success') {
-      setItem('token', data.token);
+      setItem('token', data.token as string);
       setItem('user', JSON.stringify(data.user));
       dispatch(loginSuccess({token: data.token, user: data.user}));
     } else {

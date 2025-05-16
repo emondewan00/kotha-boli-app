@@ -10,9 +10,12 @@ type NavigationItemProps = NavigationItem & {
 const NavigationComponent: React.FC<NavigationItemProps> = ({
   icon,
   title,
+  onPress,
 }) => {
   return (
-    <Pressable className="flex-row justify-between items-center py-5">
+    <Pressable
+      onPress={onPress}
+      className="flex-row justify-between items-center py-5">
       <View className="flex-row items-center gap-x-3">
         <Icon
           name={icon}

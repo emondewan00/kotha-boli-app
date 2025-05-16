@@ -4,47 +4,51 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import profile from '../assets/user.png';
 import Icon from '@react-native-vector-icons/ant-design';
 import NavigationComponent from '../components/NavigationComponent';
+import {useAppDispatch} from '../hooks/redux';
+import {logout} from '../features/authSlice';
 
 export type NavigationItem = {
   id: number;
   icon: 'edit' | 'setting' | 'question-circle' | 'logout' | 'lock' | 'mail';
   title: string;
+  onPress?: () => void;
 };
 
-const data: Array<NavigationItem> = [
-  {
-    id: 1,
-    icon: 'edit',
-    title: 'Edit Profile',
-  },
-  {
-    id: 2,
-    icon: 'lock',
-    title: 'Change Password',
-  },
-  {
-    id: 3,
-    icon: 'mail',
-    title: 'Change Email Address',
-  },
-  {
-    id: 4,
-    icon: 'setting',
-    title: 'Settings',
-  },
-  {
-    id: 5,
-    icon: 'question-circle',
-    title: 'Help & Support',
-  },
-  {
-    id: 6,
-    icon: 'logout',
-    title: 'Logout',
-  },
-];
-
 const Profile = () => {
+  const dispatch = useAppDispatch();
+  const data: Array<NavigationItem> = [
+    {
+      id: 1,
+      icon: 'edit',
+      title: 'Edit Profile',
+    },
+    {
+      id: 2,
+      icon: 'lock',
+      title: 'Change Password',
+    },
+    {
+      id: 3,
+      icon: 'mail',
+      title: 'Change Email Address',
+    },
+    {
+      id: 4,
+      icon: 'setting',
+      title: 'Settings',
+    },
+    {
+      id: 5,
+      icon: 'question-circle',
+      title: 'Help & Support',
+    },
+    {
+      id: 6,
+      icon: 'logout',
+      title: 'Logout',
+      onPress: () => dispatch(logout()),
+    },
+  ];
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="bg-[#7B3FD3] items-center justify-center h-96">
