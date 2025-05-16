@@ -13,18 +13,29 @@ import Icon from '@react-native-vector-icons/ionicons';
 import PasswordInput from '../components/PasswordInput';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AuthNavigatorParamList from '../types/authNavigator';
-
+import {useLoginMutation} from '../api/userApi';
+import {setItem} from '../utils/storage';
+import {useAppDispatch} from '../hooks/redux';
+import {loginSuccess} from '../features/authSlice';
 type LoginProps = NativeStackScreenProps<AuthNavigatorParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [login] = useLoginMutation();
+  const dispatch = useAppDispatch();
 
-  const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
+  const handleSubmit = async () => {
+    const {data, error} = await login({email, password});
+    if (data?.status === 'success') {
+      setItem('token', data.token);
+      setItem('user', JSON.stringify(data.user));
+      dispatch(loginSuccess({token: data.token, user: data.user}));
+    } else {
+      console.log(error, data);
+    }
   };
+
   return (
     <SafeAreaView className=" flex-1 bg-white">
       <ScrollView>
@@ -76,11 +87,10 @@ const Login = ({navigation}: LoginProps) => {
                 label="Password"
                 iconSize={20}
               />
-              <View>
-                <Text className="text-slate-700 text-right">
-                  Forgot Password?
-                </Text>
-              </View>
+
+              <Text className="text-slate-700 text-right my-2">
+                Forgot Password?
+              </Text>
 
               <TouchableOpacity
                 onPress={handleSubmit}
@@ -90,19 +100,16 @@ const Login = ({navigation}: LoginProps) => {
             </View>
           </View>
         </View>
-        <View className="mt-1">
-          <View>
-            <Text className="text-slate-700 text-center">
-              New User?
-              <Text
-                onPress={() => navigation.navigate('SignUp')}
-                className="text-[#5A0FC8]">
-                {' '}
-                Register.
-              </Text>
-            </Text>
-          </View>
-        </View>
+
+        <Text className="text-slate-700 text-center mt-3">
+          New User?
+          <Text
+            onPress={() => navigation.navigate('SignUp')}
+            className="text-[#5A0FC8]">
+            {' '}
+            Register.
+          </Text>
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

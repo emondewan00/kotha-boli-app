@@ -1,8 +1,8 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
-import RootStackParamList from './rootStackNavigator';
+import AppNavigatorParamList from './appNavigator';
 
 type TabNavigatorParamList = {
-  Home: NavigatorScreenParams<RootStackParamList>;
+  Home: NavigatorScreenParams<AppNavigatorParamList>;
   Profile: undefined;
 };
 
