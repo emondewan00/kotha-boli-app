@@ -17,6 +17,7 @@ import {useLoginMutation} from '../api/userApi';
 import {setItem} from '../utils/storage';
 import {useAppDispatch} from '../hooks/redux';
 import {loginSuccess} from '../features/authSlice';
+import Toast from 'react-native-toast-message';
 type LoginProps = NativeStackScreenProps<AuthNavigatorParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
@@ -26,13 +27,28 @@ const Login = ({navigation}: LoginProps) => {
   const dispatch = useAppDispatch();
 
   const handleSubmit = async () => {
-    const {data, error} = await login({email, password});
-    if (data?.status === 'success') {
-      setItem('token', data.token as string);
-      setItem('user', JSON.stringify(data.user));
-      dispatch(loginSuccess({token: data.token, user: data.user}));
-    } else {
-      console.log(error, data);
+    try {
+      const {data} = await login({email, password});
+
+      if (data?.status === 'success') {
+        setItem('token', data.token as string);
+        setItem('user', JSON.stringify(data.user));
+        dispatch(loginSuccess({token: data.token, user: data.user}));
+        Toast.show({
+          type: 'success',
+          text1: 'Login successfully.',
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Server error. Please try again.',
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: error as string,
+      });
     }
   };
 

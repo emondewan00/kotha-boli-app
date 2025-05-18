@@ -4,6 +4,7 @@ import store from './src/store/store';
 import './global.css';
 import RootNavigator from './src/navigation/RootNavigator';
 import {NavigationContainer} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
       <NavigationContainer>
         <RootNavigator />
       </NavigationContainer>
+      <Toast />
     </Provider>
   );
 };

@@ -16,6 +16,7 @@ import {useRegisterMutation} from '../api/userApi';
 import {loginSuccess} from '../features/authSlice';
 import {useAppDispatch} from '../hooks/redux';
 import {setItem} from '../utils/storage';
+import Toast from 'react-native-toast-message';
 
 type RegisterProps = NativeStackScreenProps<AuthNavigatorParamList, 'SignUp'>;
 
@@ -27,15 +28,29 @@ const Register = ({navigation}: RegisterProps) => {
   const dispatch = useAppDispatch();
 
   const handleSubmit = async () => {
-    const {data, error} = await register({email, password, name});
-    console.log('hello', error, data);
+    try {
+      const {data} = await register({email, password, name});
 
-    if (data?.status === 'success') {
-      dispatch(loginSuccess({token: data.token, user: data.user}));
-      setItem('token', data.token as string);
-      setItem('user', JSON.stringify(data.user));
-    } else {
-      console.log(data, error);
+      if (data?.status === 'success') {
+        dispatch(loginSuccess({token: data.token, user: data.user}));
+        setItem('token', data.token as string);
+        setItem('user', JSON.stringify(data.user));
+        Toast.show({
+          type: 'success',
+          text1: 'Registration successfully.',
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Server error. Please try again.',
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Please try again.',
+        text2: error as string,
+      });
     }
   };
 

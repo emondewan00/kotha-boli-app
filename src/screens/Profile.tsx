@@ -4,8 +4,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import profile from '../assets/user.png';
 import Icon from '@react-native-vector-icons/ant-design';
 import NavigationComponent from '../components/NavigationComponent';
-import {useAppDispatch} from '../hooks/redux';
-import {logout} from '../features/authSlice';
+import {useAppDispatch, useAppSelector} from '../hooks/redux';
+import {logout, selectUser} from '../features/authSlice';
 
 export type NavigationItem = {
   id: number;
@@ -16,6 +16,7 @@ export type NavigationItem = {
 
 const Profile = () => {
   const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
   const data: Array<NavigationItem> = [
     {
       id: 1,
@@ -49,6 +50,7 @@ const Profile = () => {
       onPress: () => dispatch(logout()),
     },
   ];
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="bg-[#7B3FD3] items-center justify-center h-96">
@@ -64,7 +66,9 @@ const Profile = () => {
               <Icon name="edit" color={'#7B3FD3'} size={20} />
             </View>
           </View>
-          <Text className="text-white text-3xl font-bold mt-2">John Doe</Text>
+          <Text className="text-white text-3xl font-bold mt-2">
+            {user.name}
+          </Text>
         </View>
       </View>
       <View
