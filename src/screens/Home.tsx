@@ -1,5 +1,5 @@
 import {View, Text, Image, FlatList, Pressable} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import user from '../assets/user.png';
 import SearchBar from '../components/SearchBar';
@@ -8,6 +8,9 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import TabNavigatorParamList from '../types/tabNavigator';
 import {CompositeScreenProps} from '@react-navigation/native';
 import AppNavigatorParamList from '../types/appNavigator';
+import {useLazyFindUserQuery} from '../api/userApi';
+import UserCard from '../components/UserCard';
+import ConversationCard from '../components/conversationCard';
 
 type HomeParamList = CompositeScreenProps<
   NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
@@ -15,55 +18,41 @@ type HomeParamList = CompositeScreenProps<
 >;
 
 const Home = ({navigation}: HomeParamList) => {
+  const [triggerGetUsers, {data, isLoading, isError}] = useLazyFindUserQuery();
+  const [state, setState] = useState<'conversation' | 'search'>('conversation');
+
+  const emptyList = () => {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-slate-700 text-lg">
+          {state === 'search' ? 'No User Found' : 'No Conversation Found'}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView className="bg-white flex-1">
-      <SearchBar />
+      <SearchBar triggerGetUsers={triggerGetUsers} changeState={setState} />
       <FlatList
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-        keyExtractor={item => item.toString()}
+        data={state === 'search' ? data : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+        keyExtractor={item => item._id.toString()}
         contentContainerClassName="gap-y-1 by-20 px-5"
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={Separator}
-        renderItem={({item, index}) => {
-          return (
-            <Pressable
-              onPress={() =>
-                navigation.navigate('Chat', {
-                  chatId: item.toString(),
-                })
-              }
-              key={index}
-              className="flex flex-row gap-x-2 py-4">
-              <Image
-                source={user}
-                className="h-13 w-13 rounded-full my-auto"
-                resizeMode="cover"
-              />
-
-              <View className="flex-1 flex flex-col gap-y-2 ">
-                <Text
-                  className="text-xl font-bold text-slate-700"
-                  numberOfLines={1}>
-                  John Doe
-                </Text>
-                <Text
-                  numberOfLines={2}
-                  ellipsizeMode="tail"
-                  className="text-slate-700 text-sm">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </Text>
-              </View>
-
-              <View className="justify-around items-end">
-                <Text className="text-sm text-slate-700">10 min </Text>
-                <Text className="px-1 rounded text-sm bg-[#5A0FC8] text-white">
-                  2
-                </Text>
-              </View>
-            </Pressable>
+        renderItem={({item}) => {
+          return state === 'search' ? (
+            <UserCard
+              user={item}
+              onPress={() => navigation.navigate('Chat', {chatId: item._id})}
+            />
+          ) : (
+            <ConversationCard
+              onPress={() => navigation.navigate('Chat', {chatId: item._id})}
+            />
           );
         }}
+        ListEmptyComponent={emptyList}
       />
     </SafeAreaView>
   );

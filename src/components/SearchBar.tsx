@@ -4,8 +4,30 @@ import Icon from '@react-native-vector-icons/ionicons';
 import FontAwesome from '@react-native-vector-icons/fontawesome';
 import CreateGroupModal from './CreateGroupModal';
 
-const SearchBar = () => {
+type Props = {
+  triggerGetUsers: (text: string) => void;
+  changeState: (state: 'conversation' | 'search') => void;
+};
+
+const SearchBar: React.FC<Props> = ({triggerGetUsers, changeState}) => {
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  let timer: NodeJS.Timeout;
+
+  const handleSearch = (text: string) => {
+    if (text.length === 0) {
+      changeState('conversation');
+    } else {
+      changeState('search');
+    }
+
+    timer && clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      const encodedText = encodeURIComponent(text);
+      triggerGetUsers(encodedText);
+    }, 1000);
+  };
 
   return (
     <>
@@ -24,6 +46,7 @@ const SearchBar = () => {
             placeholder="Search"
             className="py-4 grow text-slate-700"
             placeholderTextColor={'gray'}
+            onChangeText={handleSearch}
           />
         </View>
       </View>

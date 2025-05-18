@@ -29,12 +29,16 @@ const Register = ({navigation}: RegisterProps) => {
 
   const handleSubmit = async () => {
     try {
-      const {data} = await register({email, password, name});
+      const {status, token, user} = await register({
+        email,
+        password,
+        name,
+      }).unwrap();
 
-      if (data?.status === 'success') {
-        dispatch(loginSuccess({token: data.token, user: data.user}));
-        setItem('token', data.token as string);
-        setItem('user', JSON.stringify(data.user));
+      if (status === 'success') {
+        dispatch(loginSuccess({token: token, user: user}));
+        setItem('token', token as string);
+        setItem('user', JSON.stringify(user));
         Toast.show({
           type: 'success',
           text1: 'Registration successfully.',

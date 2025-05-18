@@ -28,12 +28,15 @@ const Login = ({navigation}: LoginProps) => {
 
   const handleSubmit = async () => {
     try {
-      const {data} = await login({email, password});
+      const {status, token, user} = await login({
+        email,
+        password,
+      }).unwrap();
 
-      if (data?.status === 'success') {
-        setItem('token', data.token as string);
-        setItem('user', JSON.stringify(data.user));
-        dispatch(loginSuccess({token: data.token, user: data.user}));
+      if (status === 'success') {
+        setItem('token', token as string);
+        setItem('user', JSON.stringify(user));
+        dispatch(loginSuccess({token: token, user: user}));
         Toast.show({
           type: 'success',
           text1: 'Login successfully.',

@@ -36,7 +36,11 @@ export const userApi = baseApi.injectEndpoints({
         body: credentials,
       }),
     }),
+    findUser: builder.query<any, string>({
+      query: query => ({url: `/users?search=${query}`}),
+    }),
   }),
 });
 
-export const {useLoginMutation, useRegisterMutation} = userApi;
+export const {useLoginMutation, useRegisterMutation, useLazyFindUserQuery} =
+  userApi;
