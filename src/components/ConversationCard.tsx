@@ -5,7 +5,7 @@ import {useAppSelector} from '../hooks/redux';
 import {selectUser} from '../features/authSlice';
 
 type Props = {
-  onPress: () => void;
+  onPress: (name: string) => void;
   conversation: {
     _id: string;
     name: string;
@@ -26,7 +26,9 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
         .map(member => member.name)
         .join(', ');
   return (
-    <Pressable onPress={onPress} className="flex flex-row gap-x-2 py-4">
+    <Pressable
+      onPress={() => onPress(conversationName)}
+      className="flex flex-row gap-x-2 py-4">
       <Image
         source={user}
         className="h-13 w-13 rounded-full my-auto"

@@ -12,7 +12,7 @@ type Props = {
     name: string;
     email: string;
   };
-  navigate: (id: string) => void;
+  navigate: (id: string, name: string) => void;
 };
 
 const UserCard: React.FC<Props> = ({user, navigate}) => {
@@ -22,11 +22,11 @@ const UserCard: React.FC<Props> = ({user, navigate}) => {
   const handleCreateConversation = async () => {
     try {
       const data = await createConversation({
-        members: [loggedInUser._id, user._id],
+        members: [loggedInUser._id , user._id],
         type: 'private',
       }).unwrap();
       if (data) {
-        navigate(data._id);
+        navigate(data._id, user.name);
       }
     } catch (error) {
       console.log(error);

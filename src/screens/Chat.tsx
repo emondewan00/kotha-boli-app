@@ -7,10 +7,14 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import ChatInput from '../components/ChatInput';
 import {socket} from '../utils/socket';
 import AppNavigatorParamList from '../types/appNavigator';
+import {selectUser} from '../features/authSlice';
+import {useAppSelector} from '../hooks/redux';
 
 type ChatParamList = NativeStackScreenProps<AppNavigatorParamList, 'Chat'>;
 
-const Chat = ({navigation}: ChatParamList) => {
+const Chat = ({navigation, route}: ChatParamList) => {
+  const {conversationName} = route.params;
+
   useEffect(() => {
     socket.on('connect', () => {
       console.log('connected');
@@ -19,33 +23,13 @@ const Chat = ({navigation}: ChatParamList) => {
       socket.disconnect();
     };
   }, []);
-  const user = 'emon@gmail.com';
-  const data = [
-    {
-      id: 1,
-      message: 'Hello',
-      user: {
-        name: 'Emon Hossain',
-        email: 'emon@gmail.com',
-      },
-    },
-    {
-      id: 2,
-      message: 'Hello',
-      user: {
-        name: 'Emon Hossain',
-        email: 'hossain@gmail.com',
-      },
-    },
-    {
-      id: 3,
-      message: 'Test',
-      user: {
-        name: 'Emon Hossain',
-        email: 'hossain@gmail.com',
-      },
-    },
-  ];
+  const loggedInUser = useAppSelector(selectUser);
+
+  const data: Array<{
+    id: number;
+    message: string;
+    user: {name: string; email: string};
+  }> = [];
 
   return (
     <SafeAreaView className="bg-[#7B3FD3] flex-1">
@@ -62,8 +46,10 @@ const Chat = ({navigation}: ChatParamList) => {
           />
         </Pressable>
         <View>
-          <Text className="text-white text-xl font-bold">Emon Hossain</Text>
-          <Text className="text-white text-sm">emon@gmail.com</Text>
+          <Text className="text-white text-xl font-bold">
+            {conversationName}
+          </Text>
+          <Text className="text-white text-sm">{}</Text>
         </View>
         <View
           className="flex flex-row "
@@ -82,12 +68,16 @@ const Chat = ({navigation}: ChatParamList) => {
           return (
             <View
               className={`flex  gap-x-2 ${
-                item.user.email === user ? 'flex-row' : 'flex-row-reverse'
+                item.user.email === loggedInUser.email
+                  ? 'flex-row'
+                  : 'flex-row-reverse'
               } ${isProfileShow ? '' : 'mt-4'}`}>
               <View className={`grow w-[80%] ${isProfileShow ? '' : 'ml-12'}`}>
                 <Text
                   className={`text-white rounded-3xl p-3  ${
-                    item.user.email === user ? 'bg-[#7B3FD3]' : 'bg-[#AD87E4]'
+                    item.user.email === loggedInUser.email
+                      ? 'bg-[#7B3FD3]'
+                      : 'bg-[#AD87E4]'
                   }`}>
                   {item.message}
                   Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -97,7 +87,7 @@ const Chat = ({navigation}: ChatParamList) => {
                 </Text>
                 <Text
                   className={`text-xs text-slate-700 ${
-                    item.user.email === user
+                    item.user.email === loggedInUser.email
                       ? 'text-right pr-4'
                       : 'text-left pl-4'
                   }`}>

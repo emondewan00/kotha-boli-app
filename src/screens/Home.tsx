@@ -7,7 +7,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import TabNavigatorParamList from '../types/tabNavigator';
 import {CompositeScreenProps} from '@react-navigation/native';
 import AppNavigatorParamList from '../types/appNavigator';
-import {useLazyFindUserQuery} from '../api/userApi';
+import {useLazyFindUsersQuery} from '../api/userApi';
 import UserCard from '../components/UserCard';
 import ConversationCard from '../components/ConversationCard';
 import {useAppSelector} from '../hooks/redux';
@@ -20,7 +20,7 @@ type HomeParamList = CompositeScreenProps<
 >;
 
 const Home = ({navigation}: HomeParamList) => {
-  const [triggerGetUsers, {data}] = useLazyFindUserQuery();
+  const [triggerGetUsers, {data}] = useLazyFindUsersQuery();
   const user = useAppSelector(selectUser);
   const {data: conversations} = useGetConversationsQuery(user._id);
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
@@ -33,6 +33,13 @@ const Home = ({navigation}: HomeParamList) => {
         </Text>
       </View>
     );
+  };
+
+  const navigateToChat = (id: string, name: string) => {
+    navigation.navigate('Chat', {
+      chatId: id,
+      conversationName: name,
+    });
   };
 
   return (
@@ -49,11 +56,11 @@ const Home = ({navigation}: HomeParamList) => {
           return state === 'search' ? (
             <UserCard
               user={item}
-              navigate={id => navigation.navigate('Chat', {chatId: id})}
+              navigate={(id: string, name: string) => navigateToChat(id, name)}
             />
           ) : (
             <ConversationCard
-              onPress={() => navigation.navigate('Chat', {chatId: item._id})}
+              onPress={(name: string) => navigateToChat(item._id, name)}
               conversation={item}
             />
           );
