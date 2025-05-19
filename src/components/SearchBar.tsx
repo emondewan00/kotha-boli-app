@@ -25,6 +25,7 @@ const SearchBar: React.FC<Props> = ({triggerGetUsers, changeState}) => {
 
     timer = setTimeout(() => {
       const encodedText = encodeURIComponent(text);
+      if (encodedText.length === 0) {return;}
       triggerGetUsers(encodedText);
     }, 1000);
   };

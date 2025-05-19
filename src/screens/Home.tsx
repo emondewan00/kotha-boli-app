@@ -1,7 +1,6 @@
-import {View, Text, Image, FlatList, Pressable} from 'react-native';
+import {View, Text, FlatList} from 'react-native';
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import user from '../assets/user.png';
 import SearchBar from '../components/SearchBar';
 import Separator from '../components/Separator';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -10,7 +9,10 @@ import {CompositeScreenProps} from '@react-navigation/native';
 import AppNavigatorParamList from '../types/appNavigator';
 import {useLazyFindUserQuery} from '../api/userApi';
 import UserCard from '../components/UserCard';
-import ConversationCard from '../components/conversationCard';
+import ConversationCard from '../components/ConversationCard';
+import {useAppSelector} from '../hooks/redux';
+import {selectUser} from '../features/authSlice';
+import {useGetConversationsQuery} from '../api/conversationApi';
 
 type HomeParamList = CompositeScreenProps<
   NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
@@ -19,6 +21,8 @@ type HomeParamList = CompositeScreenProps<
 
 const Home = ({navigation}: HomeParamList) => {
   const [triggerGetUsers, {data, isLoading, isError}] = useLazyFindUserQuery();
+  const user = useAppSelector(selectUser);
+  const {data: conversations} = useGetConversationsQuery(user._id);
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
 
   const emptyList = () => {
@@ -35,7 +39,8 @@ const Home = ({navigation}: HomeParamList) => {
     <SafeAreaView className="bg-white flex-1">
       <SearchBar triggerGetUsers={triggerGetUsers} changeState={setState} />
       <FlatList
-        data={state === 'search' ? data : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+        key={state}
+        data={state === 'search' ? data : conversations}
         keyExtractor={item => item._id.toString()}
         contentContainerClassName="gap-y-1 by-20 px-5"
         showsVerticalScrollIndicator={false}
@@ -49,6 +54,7 @@ const Home = ({navigation}: HomeParamList) => {
           ) : (
             <ConversationCard
               onPress={() => navigation.navigate('Chat', {chatId: item._id})}
+              conversation={item}
             />
           );
         }}

@@ -4,9 +4,17 @@ import user from '../assets/user.png';
 
 type Props = {
   onPress: () => void;
+  conversation: {
+    _id: string;
+    name: string;
+    type: 'group' | 'private';
+    image?: string;
+    lastMessage?: {};
+  };
 };
 
-const ConversationCard: React.FC<Props> = ({onPress}) => {
+const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
+
   return (
     <Pressable onPress={onPress} className="flex flex-row gap-x-2 py-4">
       <Image
@@ -17,7 +25,7 @@ const ConversationCard: React.FC<Props> = ({onPress}) => {
 
       <View className="flex-1 flex flex-col gap-y-2 ">
         <Text className="text-xl font-bold text-slate-700" numberOfLines={1}>
-          John Doe
+          {conversation.name}
         </Text>
         <Text
           numberOfLines={2}
