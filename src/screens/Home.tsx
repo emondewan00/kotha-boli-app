@@ -20,7 +20,7 @@ type HomeParamList = CompositeScreenProps<
 >;
 
 const Home = ({navigation}: HomeParamList) => {
-  const [triggerGetUsers, {data, isLoading, isError}] = useLazyFindUserQuery();
+  const [triggerGetUsers, {data}] = useLazyFindUserQuery();
   const user = useAppSelector(selectUser);
   const {data: conversations} = useGetConversationsQuery(user._id);
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
@@ -49,7 +49,7 @@ const Home = ({navigation}: HomeParamList) => {
           return state === 'search' ? (
             <UserCard
               user={item}
-              onPress={() => navigation.navigate('Chat', {chatId: item._id})}
+              navigate={id => navigation.navigate('Chat', {chatId: id})}
             />
           ) : (
             <ConversationCard

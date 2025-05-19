@@ -1,6 +1,9 @@
-import {Image, Pressable, Text, View} from 'react-native';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import userImage from '../assets/user.png';
+import {useCreateConversationMutation} from '../api/conversationApi';
+import {useAppSelector} from '../hooks/redux';
+import {selectUser} from '../features/authSlice';
 
 type Props = {
   user: {
@@ -9,12 +12,31 @@ type Props = {
     name: string;
     email: string;
   };
-  onPress: () => void;
+  navigate: (id: string) => void;
 };
 
-const UserCard: React.FC<Props> = ({user, onPress}) => {
+const UserCard: React.FC<Props> = ({user, navigate}) => {
+  const [createConversation] = useCreateConversationMutation();
+  const loggedInUser = useAppSelector(selectUser);
+
+  const handleCreateConversation = async () => {
+    try {
+      const data = await createConversation({
+        members: [loggedInUser._id, user._id],
+        type: 'private',
+      }).unwrap();
+      if (data) {
+        navigate(data._id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <Pressable onPress={onPress} className="flex flex-row gap-x-2 py-4">
+    <TouchableOpacity
+      onPress={handleCreateConversation}
+      className="flex flex-row gap-x-2 py-4">
       <Image
         source={userImage}
         className="h-13 w-13 rounded-full my-auto"
@@ -32,7 +54,7 @@ const UserCard: React.FC<Props> = ({user, onPress}) => {
           {user.email}
         </Text>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 
