@@ -17,6 +17,7 @@ const conversationApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     getConversations: builder.query<ConversationResponse, void>({
       query: userId => ({url: `/users/${userId}/conversations`}),
+      providesTags: ['conversations'],
     }),
     createConversation: builder.mutation<
       ConversationResponse,
@@ -27,6 +28,7 @@ const conversationApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ['conversations'],
     }),
   }),
 });

@@ -4,15 +4,15 @@ import {
   BaseQueryFn,
 } from '@reduxjs/toolkit/query/react';
 import {API_BASE_URL} from '@env';
-import {getItem} from '../utils/storage';
 import {logout} from '../features/authSlice';
+import {RootState} from '../store/store';
 
 // base query
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: 'include',
-  prepareHeaders: headers => {
-    const token = getItem('token');
+  prepareHeaders: (headers, {getState}) => {
+    const token = (getState() as RootState).auth.token;
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -38,5 +38,6 @@ export const baseQueryWithReauth: BaseQueryFn = async (
 export const baseApi = createApi({
   reducerPath: 'baseApi',
   baseQuery: baseQueryWithReauth,
+  tagTypes: ['conversations'],
   endpoints: () => ({}),
 });
