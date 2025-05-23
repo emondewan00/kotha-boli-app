@@ -22,7 +22,7 @@ const UserCard: React.FC<Props> = ({user, navigate}) => {
   const handleCreateConversation = async () => {
     try {
       const data = await createConversation({
-        members: [loggedInUser._id , user._id],
+        members: [loggedInUser._id, user._id],
         type: 'private',
       }).unwrap();
       if (data) {

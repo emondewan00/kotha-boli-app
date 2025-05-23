@@ -1,8 +1,6 @@
 import {View, Text, Pressable, Image} from 'react-native';
 import React from 'react';
 import user from '../assets/user.png';
-import {useAppSelector} from '../hooks/redux';
-import {selectUser} from '../features/authSlice';
 
 type Props = {
   onPress: (name: string) => void;
@@ -17,17 +15,9 @@ type Props = {
 };
 
 const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
-  const userData = useAppSelector(selectUser);
-
-  const conversationName = conversation.name
-    ? conversation.name
-    : conversation.members
-        .filter(member => member._id !== userData._id)
-        .map(member => member.name)
-        .join(', ');
   return (
     <Pressable
-      onPress={() => onPress(conversationName)}
+      onPress={() => onPress(conversation.name)}
       className="flex flex-row gap-x-2 py-4">
       <Image
         source={user}
@@ -37,7 +27,7 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
 
       <View className="flex-1 flex flex-col gap-y-2 ">
         <Text className="text-xl font-bold text-slate-700" numberOfLines={1}>
-          {conversationName}
+          {conversation.name}
         </Text>
         <Text
           numberOfLines={2}

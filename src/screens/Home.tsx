@@ -1,5 +1,5 @@
 import {View, Text, FlatList} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import SearchBar from '../components/SearchBar';
 import Separator from '../components/Separator';
@@ -13,6 +13,8 @@ import ConversationCard from '../components/ConversationCard';
 import {useAppSelector} from '../hooks/redux';
 import {selectUser} from '../features/authSlice';
 import {useGetConversationsQuery} from '../api/conversationApi';
+import {socket} from '../utils/socket';
+import Toast from 'react-native-toast-message';
 
 type HomeParamList = CompositeScreenProps<
   NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
@@ -24,6 +26,21 @@ const Home = ({navigation}: HomeParamList) => {
   const user = useAppSelector(selectUser);
   const {data: conversations} = useGetConversationsQuery(user._id);
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
+
+  useEffect(() => {
+    socket.on('newConversation', conversationData => {
+      Toast.show({
+        type: 'success',
+        text1: 'New Conversation',
+        text2: conversationData.name,
+      });
+    });
+
+    return () => {
+      socket.off('newConversation');
+      socket.disconnect();
+    };
+  }, [user._id]);
 
   const emptyList = () => {
     return (

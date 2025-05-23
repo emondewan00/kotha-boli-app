@@ -14,7 +14,6 @@ import PasswordInput from '../components/PasswordInput';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import AuthNavigatorParamList from '../types/authNavigator';
 import {useLoginMutation} from '../api/userApi';
-import {setItem} from '../utils/storage';
 import {useAppDispatch} from '../hooks/redux';
 import {loginSuccess} from '../features/authSlice';
 import Toast from 'react-native-toast-message';
@@ -34,8 +33,6 @@ const Login = ({navigation}: LoginProps) => {
       }).unwrap();
 
       if (status === 'success') {
-        setItem('token', token as string);
-        setItem('user', JSON.stringify(user));
         dispatch(loginSuccess({token: token, user: user}));
         Toast.show({
           type: 'success',

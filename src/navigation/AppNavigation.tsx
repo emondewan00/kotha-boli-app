@@ -2,10 +2,27 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
 import Chat from '../screens/Chat';
 import AppNavigatorParamList from '../types/appNavigator';
+import {selectUser} from '../features/authSlice';
+import {useAppSelector} from '../hooks/redux';
+import {useEffect} from 'react';
+import {socket} from '../utils/socket';
 
 const AppStack = createNativeStackNavigator<AppNavigatorParamList>();
 
 const AppNavigator = () => {
+  const user = useAppSelector(selectUser);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('connected');
+    });
+    socket.emit('user-connected', user._id);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user._id]);
+
   return (
     <AppStack.Navigator>
       <AppStack.Screen
