@@ -9,20 +9,27 @@ import {socket} from '../utils/socket';
 import AppNavigatorParamList from '../types/appNavigator';
 import {selectUser} from '../features/authSlice';
 import {useAppSelector} from '../hooks/redux';
+import Toast from 'react-native-toast-message';
 
 type ChatParamList = NativeStackScreenProps<AppNavigatorParamList, 'Chat'>;
 
 const Chat = ({navigation, route}: ChatParamList) => {
-  const {conversationName} = route.params;
+  const {conversationName, chatId} = route.params;
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('connected');
+    socket.emit('joinRoom', chatId);
+    socket.on('message', data => {
+      console.log(data);
+      Toast.show({
+        type: 'success',
+        text1: 'New message',
+        text2: JSON.stringify(data),
+      });
     });
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [chatId]);
   const loggedInUser = useAppSelector(selectUser);
 
   const data: Array<{
@@ -107,7 +114,7 @@ const Chat = ({navigation, route}: ChatParamList) => {
           );
         }}
       />
-      <ChatInput />
+      <ChatInput conversationId={chatId} />
     </SafeAreaView>
   );
 };

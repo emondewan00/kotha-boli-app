@@ -1,16 +1,33 @@
 import {View, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import Icon from '@react-native-vector-icons/ionicons';
+import {useAppSelector} from '../hooks/redux';
+import {useCreateMessageMutation} from '../api/messageApi';
+import {selectUser} from '../features/authSlice';
 
-const ChatInput = () => {
+type Props = {
+  conversationId: string;
+};
+
+const ChatInput: React.FC<Props> = ({conversationId}) => {
+  const user = useAppSelector(selectUser);
   const [message, setMessage] = useState('');
+  const [createMessage] = useCreateMessageMutation();
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim()) {
       return null;
     }
-    console.log({message});
-    setMessage('');
+    try {
+      const data = await createMessage({
+        content: message,
+        sender: user._id,
+        conversationId,
+      }).unwrap();
+
+      console.log(data);
+      setMessage('');
+    } catch (error) {}
   };
 
   return (

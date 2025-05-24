@@ -1,6 +1,8 @@
 import {View, Text, Pressable, Image} from 'react-native';
 import React from 'react';
 import user from '../assets/user.png';
+import {selectUser} from '../features/authSlice';
+import {useAppSelector} from '../hooks/redux';
 
 type Props = {
   onPress: (name: string) => void;
@@ -9,32 +11,58 @@ type Props = {
     name: string;
     type: 'group' | 'private';
     image?: string;
-    lastMessage?: {};
+    lastMessage?: {
+      _id: string;
+      content: string;
+      createdAt: string;
+      sender: {
+        _id: string;
+        name: string;
+      };
+    };
     members: {_id: string; name: string}[];
+    isOnline: string;
+    updatedAt: string;
   };
 };
 
 const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
+  const {name, lastMessage, members, isOnline} = conversation;
+
+  const loggedInUser = useAppSelector(selectUser);
+  const whoIsSender = members.find(
+    member => member._id === lastMessage?.sender._id,
+  );
+  console.log(isOnline);
+  let nameOfSender = '';
+
+  if (whoIsSender?._id === loggedInUser._id) {
+    nameOfSender = 'You';
+  } else {
+    nameOfSender = whoIsSender?.name || '';
+  }
+
   return (
     <Pressable
-      onPress={() => onPress(conversation.name)}
+      onPress={() => onPress(name)}
       className="flex flex-row gap-x-2 py-4">
       <Image
         source={user}
-        className="h-13 w-13 rounded-full my-auto"
+        className={`h-13 w-13 rounded-full my-auto ${
+          isOnline.includes('online') ? 'border-2 border-green-500' : ''
+        }`}
         resizeMode="cover"
       />
 
       <View className="flex-1 flex flex-col gap-y-2 ">
         <Text className="text-xl font-bold text-slate-700" numberOfLines={1}>
-          {conversation.name}
+          {name}
         </Text>
         <Text
           numberOfLines={2}
           ellipsizeMode="tail"
           className="text-slate-700 text-sm">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          {nameOfSender}: {lastMessage?.content || 'No message'}
         </Text>
       </View>
 

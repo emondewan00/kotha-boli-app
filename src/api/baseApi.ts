@@ -10,7 +10,10 @@ import {RootState} from '../store/store';
 // base query
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
-  prepareHeaders: (headers, {getState}) => {
+  prepareHeaders: (headers, {getState, endpoint}) => {
+    if (endpoint === 'login' || endpoint === 'register') {
+      return headers;
+    }
     const token = (getState() as RootState).auth.token;
     if (token && typeof token === 'string') {
       headers.set('Authorization', `Bearer ${token}`);
