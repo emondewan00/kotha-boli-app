@@ -33,7 +33,7 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
   const whoIsSender = members.find(
     member => member._id === lastMessage?.sender._id,
   );
-  console.log(isOnline);
+
   let nameOfSender = '';
 
   if (whoIsSender?._id === loggedInUser._id) {

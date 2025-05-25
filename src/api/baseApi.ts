@@ -35,6 +35,7 @@ export const baseQueryWithReauth: BaseQueryFn = async (
     api.dispatch(logout());
   }
 
+  
   return result;
 };
 

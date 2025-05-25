@@ -9,34 +9,21 @@ import {socket} from '../utils/socket';
 import AppNavigatorParamList from '../types/appNavigator';
 import {selectUser} from '../features/authSlice';
 import {useAppSelector} from '../hooks/redux';
-import Toast from 'react-native-toast-message';
+import {useGetMessagesQuery} from '../api/messageApi';
 
 type ChatParamList = NativeStackScreenProps<AppNavigatorParamList, 'Chat'>;
 
 const Chat = ({navigation, route}: ChatParamList) => {
   const {conversationName, chatId} = route.params;
+  const {data: messages} = useGetMessagesQuery(chatId);
 
   useEffect(() => {
     socket.emit('joinRoom', chatId);
-    socket.on('message', data => {
-      console.log(data);
-      Toast.show({
-        type: 'success',
-        text1: 'New message',
-        text2: JSON.stringify(data),
-      });
-    });
     return () => {
       socket.disconnect();
     };
   }, [chatId]);
   const loggedInUser = useAppSelector(selectUser);
-
-  const data: Array<{
-    id: number;
-    message: string;
-    user: {name: string; email: string};
-  }> = [];
 
   return (
     <SafeAreaView className="bg-[#7B3FD3] flex-1">
@@ -66,54 +53,56 @@ const Chat = ({navigation, route}: ChatParamList) => {
           <Icon name="ellipsis-vertical-sharp" size={24} color="white" />
         </View>
       </View>
-      <FlatList
-        data={data}
-        contentContainerClassName="bg-white flex-1 rounded-t-[40px] py-8 px-4"
-        renderItem={({item, index}) => {
-          const isProfileShow = data[index + 1]?.user.email !== item.user.email;
 
-          return (
-            <View
-              className={`flex  gap-x-2 ${
-                item.user.email === loggedInUser.email
-                  ? 'flex-row'
-                  : 'flex-row-reverse'
-              } ${isProfileShow ? '' : 'mt-4'}`}>
-              <View className={`grow w-[80%] ${isProfileShow ? '' : 'ml-12'}`}>
-                <Text
-                  className={`text-white rounded-3xl p-3  ${
-                    item.user.email === loggedInUser.email
-                      ? 'bg-[#7B3FD3]'
-                      : 'bg-[#AD87E4]'
-                  }`}>
-                  {item.message}
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Numquam veritatis expedita tempora quis, dolorum quidem at
-                  quos molestias ratione, architecto aliquid maiores cumque ut
-                  minus incidunt atque? Nulla, assumenda dolores.
-                </Text>
-                <Text
-                  className={`text-xs text-slate-700 ${
-                    item.user.email === loggedInUser.email
-                      ? 'text-right pr-4'
-                      : 'text-left pl-4'
-                  }`}>
-                  10 min
-                </Text>
+      <View className="rounded-t-[40px] flex-1 overflow-hidden bg-white px-4 border-b border-b-gray-200">
+        <FlatList
+          data={messages || []}
+          inverted
+          showsVerticalScrollIndicator={false}
+          scrollEnabled
+          keyboardShouldPersistTaps="always"
+          keyExtractor={item => item._id}
+          renderItem={({item, index}) => {
+            const isMe = item.sender._id === loggedInUser._id;
+            const nextMessageSender = messages?.[index + 1]?.sender?._id;
+            const isProfileShow = item.sender._id !== nextMessageSender;
+
+            return (
+              <View
+                className={`flex flex-row items-end mb-4 ${
+                  isMe ? 'justify-end' : 'justify-start'
+                } `}>
+                {!isMe && isProfileShow && (
+                  <Image
+                    source={userPhoto}
+                    resizeMode="cover"
+                    className="h-10 w-10 rounded-full mr-2"
+                  />
+                )}
+
+                <View
+                  className={`max-w-[80%] ${
+                    isMe ? 'items-end' : 'items-start'
+                  } ${!isMe && !isProfileShow && 'ml-12'}`}>
+                  <Text
+                    className={`text-white rounded-3xl px-4 py-2 ${
+                      isMe ? 'bg-[#7B3FD3]' : 'bg-[#AD87E4]'
+                    }`}>
+                    {item.content}
+                  </Text>
+                  <Text
+                    className={`text-xs text-slate-500 mt-1 ${
+                      isMe ? 'text-right pr-2' : 'text-left pl-2'
+                    }`}>
+                    10 min
+                  </Text>
+                </View>
               </View>
-              {isProfileShow && (
-                <Image
-                  source={userPhoto}
-                  resizeMode="cover"
-                  className="h-12 rounded-full w-12"
-                  // eslint-disable-next-line react-native/no-inline-styles
-                  style={{marginTop: 'auto'}}
-                />
-              )}
-            </View>
-          );
-        }}
-      />
+            );
+          }}
+        />
+      </View>
+
       <ChatInput conversationId={chatId} />
     </SafeAreaView>
   );
