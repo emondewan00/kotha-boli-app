@@ -7,15 +7,22 @@ interface ConversationRequest {
   type: 'private' | 'group';
 }
 
-type ConversationResponse = ConversationRequest & {
+export type ConversationResponse = ConversationRequest & {
   _id: string;
-  lastMessage?: any;
+  lastMessage?: {
+    content: string;
+    createdAt: string;
+    sender: {
+      _id: string;
+      name: string;
+    };
+  };
   members: {_id: string; name: string}[];
 };
 
-const conversationApi = baseApi.injectEndpoints({
+export const conversationApi = baseApi.injectEndpoints({
   endpoints: builder => ({
-    getConversations: builder.query<ConversationResponse, void>({
+    getConversations: builder.query<ConversationResponse[], string>({
       query: userId => ({url: `/users/${userId}/conversations`}),
       providesTags: ['conversations'],
     }),

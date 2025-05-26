@@ -20,7 +20,7 @@ const Chat = ({navigation, route}: ChatParamList) => {
   useEffect(() => {
     socket.emit('joinRoom', chatId);
     return () => {
-      socket.disconnect();
+      socket.emit('leaveRoom', chatId);
     };
   }, [chatId]);
   const loggedInUser = useAppSelector(selectUser);

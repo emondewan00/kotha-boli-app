@@ -1,5 +1,8 @@
+import {Draft} from '@reduxjs/toolkit';
+import {RootState} from '../store/store';
 import {socket} from '../utils/socket';
 import {baseApi} from './baseApi';
+import {conversationApi, ConversationResponse} from './conversationApi';
 
 interface MessageRequest {
   conversationId: string;
@@ -30,15 +33,35 @@ const messageApi = baseApi.injectEndpoints({
       }),
       async onCacheEntryAdded(
         arg,
-        {updateCachedData, cacheDataLoaded, cacheEntryRemoved},
+        {
+          updateCachedData,
+          cacheDataLoaded,
+          cacheEntryRemoved,
+          getState,
+          dispatch,
+        },
       ) {
         try {
           await cacheDataLoaded;
+          const userId = (getState() as RootState).auth.user?._id as string;
 
           socket.on('message', data => {
             updateCachedData(draft => {
               draft.unshift(data);
             });
+
+            dispatch(
+              conversationApi.util.updateQueryData(
+                'getConversations',
+                userId,
+                (draft: Draft<ConversationResponse[]>) => {
+                  const conv = draft.find(c => c._id === data.conversation);
+                  if (conv) {
+                    conv.lastMessage = data;
+                  }
+                },
+              ),
+            );
           });
         } catch (error) {}
         await cacheEntryRemoved;

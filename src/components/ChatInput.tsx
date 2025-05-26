@@ -19,13 +19,12 @@ const ChatInput: React.FC<Props> = ({conversationId}) => {
       return null;
     }
     try {
-      const data = await createMessage({
+      await createMessage({
         content: message,
         sender: user._id,
         conversationId,
       }).unwrap();
 
-      console.log(data);
       setMessage('');
     } catch (error) {}
   };
