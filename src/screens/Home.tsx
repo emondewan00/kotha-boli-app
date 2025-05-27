@@ -1,4 +1,4 @@
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, FlatList, ActivityIndicator} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import SearchBar from '../components/SearchBar';
@@ -22,9 +22,10 @@ type HomeParamList = CompositeScreenProps<
 >;
 
 const Home = ({navigation}: HomeParamList) => {
-  const [triggerGetUsers, {data}] = useLazyFindUsersQuery();
+  const [triggerGetUsers, {data, isLoading: isLoadingUsers}] =
+    useLazyFindUsersQuery();
   const user = useAppSelector(selectUser);
-  const {data: conversations} = useGetConversationsQuery(user._id);
+  const {data: conversations, isLoading} = useGetConversationsQuery(user._id);
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
 
   useEffect(() => {
@@ -59,31 +60,41 @@ const Home = ({navigation}: HomeParamList) => {
     });
   };
 
+  const listsOfContent = (
+    <FlatList
+      key={state}
+      data={state === 'search' ? data : conversations}
+      keyExtractor={item => item._id.toString()}
+      contentContainerClassName="gap-y-1 by-20 px-5"
+      showsVerticalScrollIndicator={false}
+      ItemSeparatorComponent={Separator}
+      renderItem={({item}) => {
+        return state === 'search' ? (
+          <UserCard
+            user={item}
+            navigate={(id: string, name: string) => navigateToChat(id, name)}
+          />
+        ) : (
+          <ConversationCard
+            onPress={(name: string) => navigateToChat(item._id, name)}
+            conversation={item}
+          />
+        );
+      }}
+      ListEmptyComponent={emptyList}
+    />
+  );
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <SearchBar triggerGetUsers={triggerGetUsers} changeState={setState} />
-      <FlatList
-        key={state}
-        data={state === 'search' ? data : conversations}
-        keyExtractor={item => item._id.toString()}
-        contentContainerClassName="gap-y-1 by-20 px-5"
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={Separator}
-        renderItem={({item}) => {
-          return state === 'search' ? (
-            <UserCard
-              user={item}
-              navigate={(id: string, name: string) => navigateToChat(id, name)}
-            />
-          ) : (
-            <ConversationCard
-              onPress={(name: string) => navigateToChat(item._id, name)}
-              conversation={item}
-            />
-          );
-        }}
-        ListEmptyComponent={emptyList}
-      />
+      {isLoading || isLoadingUsers ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#7B3FD3" />
+        </View>
+      ) : (
+        listsOfContent
+      )}
     </SafeAreaView>
   );
 };
