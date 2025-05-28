@@ -1,3 +1,4 @@
+import {socket} from '../utils/socket';
 import {baseApi} from './baseApi';
 
 interface ConversationRequest {
@@ -24,7 +25,26 @@ export const conversationApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     getConversations: builder.query<ConversationResponse[], string>({
       query: userId => ({url: `/users/${userId}/conversations`}),
-      providesTags: ['conversations'],
+      async onCacheEntryAdded(
+        arg,
+        {cacheDataLoaded, cacheEntryRemoved, updateCachedData},
+      ) {
+        try {
+          await cacheDataLoaded;
+
+          socket.on('newMessage', data => {
+            updateCachedData(draft => {
+              const filtered = draft.filter(c => {
+                return c._id !== data._id;
+              });
+              filtered.unshift(data);
+              return filtered;
+            });
+          });
+        } catch (error) {}
+        await cacheEntryRemoved;
+        socket.off('newMessage');
+      },
     }),
     createConversation: builder.mutation<
       ConversationResponse,
@@ -35,7 +55,6 @@ export const conversationApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['conversations'],
     }),
   }),
 });

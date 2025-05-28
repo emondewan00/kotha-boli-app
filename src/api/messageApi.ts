@@ -74,7 +74,6 @@ const messageApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['conversations'],
     }),
   }),
 });
