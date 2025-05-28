@@ -32,6 +32,12 @@ export const conversationApi = baseApi.injectEndpoints({
         try {
           await cacheDataLoaded;
 
+          socket.on('newConversation', data => {
+            updateCachedData(draft => {
+              draft.unshift(data);
+            });
+          });
+
           socket.on('newMessage', data => {
             updateCachedData(draft => {
               const filtered = draft.filter(c => {
@@ -44,6 +50,7 @@ export const conversationApi = baseApi.injectEndpoints({
         } catch (error) {}
         await cacheEntryRemoved;
         socket.off('newMessage');
+        socket.off('newConversation');
       },
     }),
     createConversation: builder.mutation<

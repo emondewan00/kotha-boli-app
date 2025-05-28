@@ -41,7 +41,6 @@ const Home = ({navigation}: HomeParamList) => {
 
     return () => {
       socket.off('newConversation');
-      socket.disconnect();
     };
   }, [user._id]);
 
@@ -66,12 +65,9 @@ const Home = ({navigation}: HomeParamList) => {
 
   if (isLoading || isLoadingUsers) {
     content = (
-      <SafeAreaView className="bg-white flex-1">
-        <SearchBar triggerGetUsers={triggerGetUsers} changeState={setState} />
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#7B3FD3" />
-        </View>
-      </SafeAreaView>
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#7B3FD3" />
+      </View>
     );
   } else {
     content = (

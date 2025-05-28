@@ -41,31 +41,47 @@ const messageApi = baseApi.injectEndpoints({
           dispatch,
         },
       ) {
-        try {
-          await cacheDataLoaded;
-          const userId = (getState() as RootState).auth.user?._id as string;
+        await cacheDataLoaded;
 
-          socket.on('message', data => {
-            updateCachedData(draft => {
-              draft.unshift(data);
-            });
+        const state = getState() as RootState;
+        const userId = state.auth.user?._id;
 
-            dispatch(
-              conversationApi.util.updateQueryData(
-                'getConversations',
-                userId,
-                (draft: Draft<ConversationResponse[]>) => {
-                  const conv = draft.find(c => c._id === data.conversation);
-                  if (conv) {
-                    conv.lastMessage = data;
-                  }
-                },
-              ),
-            );
+        if (!userId) {return;}
+
+        const handleMessage = (data: MessageResponse) => {
+          // Update current messages list
+          updateCachedData(draft => {
+            draft.unshift(data);
           });
-        } catch (error) {}
-        await cacheEntryRemoved;
-        socket.off('message');
+
+          // Update the conversation list
+          dispatch(
+            conversationApi.util.updateQueryData(
+              'getConversations',
+              userId,
+              (draft: Draft<ConversationResponse[]>) => {
+                const targetConvIndex = draft.findIndex(
+                  c => c._id === data.conversation,
+                );
+                if (targetConvIndex !== -1) {
+                  const targetConv = draft[targetConvIndex];
+                  targetConv.lastMessage = data;
+                  draft.splice(targetConvIndex, 1); // Remove from current position
+                  draft.unshift(targetConv); // Move to top
+                }
+              },
+            ),
+          );
+        };
+
+        try {
+          socket.on('message', handleMessage);
+          await cacheEntryRemoved;
+        } catch (err) {
+          console.error('onCacheEntryAdded error:', err);
+        } finally {
+          socket.off('message', handleMessage);
+        }
       },
     }),
     createMessage: builder.mutation<MessageResponse, MessageRequest>({
