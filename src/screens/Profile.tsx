@@ -54,23 +54,24 @@ const Profile = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="bg-[#7B3FD3] items-center justify-center h-96">
-        <View>
-          <View>
+        <View className="items-center">
+          <View className="relative ">
             <Image
               source={profile}
               alt="user photo"
               resizeMode="cover"
-              className="h-28 w-28 rounded-full border-2 border-white"
+              className="h-28 w-28 rounded-full border-2 border-white relative"
             />
             <View className="bg-white rounded-full absolute p-2 bottom-0 right-0">
               <Icon name="edit" color={'#7B3FD3'} size={20} />
             </View>
           </View>
-          <Text className="text-white text-3xl font-bold mt-2">
+          <Text className="text-white text-3xl font-bold mt-2 text-center">
             {user.name}
           </Text>
         </View>
       </View>
+
       <View
         className="rounded-lg mx-8 px-5 bg-white relative -top-20"
         // eslint-disable-next-line react-native/no-inline-styles

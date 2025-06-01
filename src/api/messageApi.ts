@@ -10,7 +10,7 @@ interface MessageRequest {
   sender: string;
 }
 
-type MessageResponse = {
+export type MessageResponse = {
   _id: string;
   content: string;
   seenBy: string[];
@@ -25,11 +25,11 @@ type MessageResponse = {
   __v: number;
 };
 
-const messageApi = baseApi.injectEndpoints({
+export const messageApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     getMessages: builder.query<MessageResponse[], string>({
-      query: conversationId => ({
-        url: `/conversations/${conversationId}/messages`,
+      query: chatId => ({
+        url: `/conversations/${chatId}/messages?page=1`,
       }),
       async onCacheEntryAdded(
         arg,
@@ -46,7 +46,9 @@ const messageApi = baseApi.injectEndpoints({
         const state = getState() as RootState;
         const userId = state.auth.user?._id;
 
-        if (!userId) {return;}
+        if (!userId) {
+          return;
+        }
 
         const handleMessage = (data: MessageResponse) => {
           // Update current messages list
@@ -81,6 +83,34 @@ const messageApi = baseApi.injectEndpoints({
           console.error('onCacheEntryAdded error:', err);
         } finally {
           socket.off('message', handleMessage);
+        }
+      },
+    }),
+    loadMoreMessages: builder.query<
+      MessageResponse[],
+      {chatId: string; page: number}
+    >({
+      query: ({chatId, page}) => ({
+        url: `/conversations/${chatId}/messages?page=${page}`,
+      }),
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try {
+          const conversations = await queryFulfilled;
+
+          if (conversations && conversations.data.length > 0) {
+            dispatch(
+              messageApi.util.updateQueryData(
+                'getMessages',
+                arg.chatId,
+                (draft: Draft<MessageResponse[]>) => {
+                  return [...draft, ...conversations.data];
+                },
+              ),
+            );
+          }
+        } catch (error) {
+          console.error(error);
+          console.log('Error loading more messages');
         }
       },
     }),
