@@ -17,6 +17,12 @@ import AppNavigatorParamList from '../types/appNavigator';
 import {selectUser} from '../features/authSlice';
 import {useAppDispatch, useAppSelector} from '../hooks/redux';
 import {useGetMessagesQuery, messageApi} from '../api/messageApi';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+
+dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
 
 type ChatParamList = NativeStackScreenProps<AppNavigatorParamList, 'Chat'>;
 
@@ -51,11 +57,31 @@ const Chat = ({navigation, route}: ChatParamList) => {
   };
 
   const loader = () => {
+    if (!messages?.hasMore) {
+      return null;
+    }
     return (
       <View className="flex flex-row items-center justify-center">
         <ActivityIndicator size="large" color="#7B3FD3" />
       </View>
     );
+  };
+
+  const formatMessageTime = (timestamp: string) => {
+    const now = dayjs();
+    const sentTime = dayjs(timestamp);
+
+    if (now.diff(sentTime, 'minute') < 1) {
+      return 'Just now';
+    }
+    if (now.isSame(sentTime, 'day')) {
+      return sentTime.format('h:mm A');
+    }
+    if (now.subtract(1, 'day').isSame(sentTime, 'day')) {
+      return `Yesterday at ${sentTime.format('h:mm A')}`;
+    }
+
+    return sentTime.format('MM/DD/YY [at] h:mm A');
   };
 
   return (
@@ -89,18 +115,19 @@ const Chat = ({navigation, route}: ChatParamList) => {
 
       <View className="rounded-t-[40px] flex-1 overflow-hidden bg-white px-4 border-b border-b-gray-200">
         <FlatList
-          data={messages || []}
+          data={messages?.data || []}
           inverted
           showsVerticalScrollIndicator={false}
           scrollEnabled
           keyboardShouldPersistTaps="always"
           keyExtractor={item => item._id}
           ListFooterComponent={loader}
+          contentContainerClassName="pb-4"
           onEndReached={loadMore}
           onEndReachedThreshold={0.1}
           renderItem={({item, index}) => {
             const isMe = item.sender._id === loggedInUser._id;
-            const nextMessageSender = messages?.[index + 1]?.sender?._id;
+            const nextMessageSender = messages?.data?.[index - 1]?.sender?._id;
             const isProfileShow = item.sender._id !== nextMessageSender;
 
             return (
@@ -130,7 +157,7 @@ const Chat = ({navigation, route}: ChatParamList) => {
                     className={`text-xs text-slate-500 mt-1 ${
                       isMe ? 'text-right pr-2' : 'text-left pl-2'
                     }`}>
-                    10 min
+                    {formatMessageTime(item.createdAt)}
                   </Text>
                 </View>
               </View>

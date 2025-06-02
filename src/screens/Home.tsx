@@ -58,6 +58,17 @@ const Home = ({navigation}: HomeParamList) => {
   }, [user._id]);
 
   const emptyList = () => {
+    const isSearch = state === 'search';
+    const hasMore = isSearch ? data?.hasMore : conversations?.hasMore;
+
+    if (hasMore === undefined) {
+      return (
+        <View className="flex-1 items-center justify-center py-4">
+          <ActivityIndicator size="large" color="#7B3FD3" />
+        </View>
+      );
+    }
+
     return (
       <View className="flex-1 items-center justify-center">
         <Text className="text-slate-700 text-lg">

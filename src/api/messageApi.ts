@@ -1,8 +1,7 @@
-import {Draft} from '@reduxjs/toolkit';
 import {RootState} from '../store/store';
 import {socket} from '../utils/socket';
 import {baseApi} from './baseApi';
-import {conversationApi, ConversationResponse} from './conversationApi';
+import {conversationApi} from './conversationApi';
 
 interface MessageRequest {
   conversationId: string;
@@ -27,7 +26,10 @@ export type MessageResponse = {
 
 export const messageApi = baseApi.injectEndpoints({
   endpoints: builder => ({
-    getMessages: builder.query<MessageResponse[], string>({
+    getMessages: builder.query<
+      {data: MessageResponse[]; hasMore: boolean},
+      string
+    >({
       query: chatId => ({
         url: `/conversations/${chatId}/messages?page=1`,
       }),
@@ -53,7 +55,7 @@ export const messageApi = baseApi.injectEndpoints({
         const handleMessage = (data: MessageResponse) => {
           // Update current messages list
           updateCachedData(draft => {
-            draft.unshift(data);
+            draft.data.unshift(data);
           });
 
           // Update the conversation list
@@ -61,15 +63,15 @@ export const messageApi = baseApi.injectEndpoints({
             conversationApi.util.updateQueryData(
               'getConversations',
               userId,
-              (draft: Draft<ConversationResponse[]>) => {
-                const targetConvIndex = draft.findIndex(
+              draft => {
+                const targetConvIndex = draft.data.findIndex(
                   c => c._id === data.conversation,
                 );
                 if (targetConvIndex !== -1) {
-                  const targetConv = draft[targetConvIndex];
+                  const targetConv = draft.data[targetConvIndex];
                   targetConv.lastMessage = data;
-                  draft.splice(targetConvIndex, 1); // Remove from current position
-                  draft.unshift(targetConv); // Move to top
+                  draft.data.splice(targetConvIndex, 1); // Remove from current position
+                  draft.data.unshift(targetConv); // Move to top
                 }
               },
             ),
@@ -87,7 +89,7 @@ export const messageApi = baseApi.injectEndpoints({
       },
     }),
     loadMoreMessages: builder.query<
-      MessageResponse[],
+      {data: MessageResponse[]; hasMore: boolean},
       {chatId: string; page: number}
     >({
       query: ({chatId, page}) => ({
@@ -95,23 +97,25 @@ export const messageApi = baseApi.injectEndpoints({
       }),
       async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
-          const conversations = await queryFulfilled;
+          const {data} = await queryFulfilled;
 
-          if (conversations && conversations.data.length > 0) {
+          if (data && data.data.length > 0) {
             dispatch(
               messageApi.util.updateQueryData(
                 'getMessages',
                 arg.chatId,
-                (draft: Draft<MessageResponse[]>) => {
-                  const newMessages = [...conversations.data];
+                draft => {
+                  const newMessages = [...data.data];
                   const isMatchedLastMessage =
-                    draft[draft.length - 1]._id === newMessages[0]._id;
+                    draft.data[draft.data.length - 1]._id ===
+                    newMessages[0]._id;
 
                   if (isMatchedLastMessage) {
                     newMessages.shift(); // Remove the last message
                   }
 
-                  return [...draft, ...newMessages];
+                  draft.data.push(...newMessages);
+                  draft.hasMore = data.hasMore;
                 },
               ),
             );
@@ -132,4 +136,8 @@ export const messageApi = baseApi.injectEndpoints({
   }),
 });
 
-export const {useGetMessagesQuery, useCreateMessageMutation} = messageApi;
+export const {
+  useGetMessagesQuery,
+  useCreateMessageMutation,
+  useLazyLoadMoreMessagesQuery,
+} = messageApi;
