@@ -3,6 +3,7 @@ import React from 'react';
 import user from '../assets/user.png';
 import {selectUser} from '../features/authSlice';
 import {useAppSelector} from '../hooks/redux';
+import relativeTime from '../utils/relativeTime';
 
 type Props = {
   onPress: (name: string) => void;
@@ -27,7 +28,7 @@ type Props = {
 };
 
 const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
-  const {name, lastMessage, members, isOnline} = conversation;
+  const {name, lastMessage, members, isOnline, updatedAt} = conversation;
 
   const loggedInUser = useAppSelector(selectUser);
   const whoIsSender = members.find(
@@ -67,7 +68,9 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
       </View>
 
       <View className="justify-around items-end">
-        <Text className="text-sm text-slate-700">10 min </Text>
+        <Text className="text-sm text-slate-700">
+          {relativeTime(updatedAt)}
+        </Text>
         <Text className="px-1 rounded text-sm bg-[#5A0FC8] text-white">2</Text>
       </View>
     </Pressable>

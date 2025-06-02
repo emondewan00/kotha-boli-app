@@ -7,12 +7,18 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import TabNavigatorParamList from '../types/tabNavigator';
 import {CompositeScreenProps} from '@react-navigation/native';
 import AppNavigatorParamList from '../types/appNavigator';
-import {useLazyFindUsersQuery} from '../api/userApi';
+import {
+  useLazyFindUsersQuery,
+  useLazyLoadMoreUsersByQueryQuery,
+} from '../api/userApi';
 import UserCard from '../components/UserCard';
 import ConversationCard from '../components/ConversationCard';
 import {useAppSelector} from '../hooks/redux';
 import {selectUser} from '../features/authSlice';
-import {useGetConversationsQuery} from '../api/conversationApi';
+import {
+  useGetConversationsQuery,
+  useLazyLoadMoreConversationsQuery,
+} from '../api/conversationApi';
 import {socket} from '../utils/socket';
 import Toast from 'react-native-toast-message';
 
@@ -28,6 +34,13 @@ const Home = ({navigation}: HomeParamList) => {
   const {data: conversations, isLoading} = useGetConversationsQuery(user._id, {
     refetchOnMountOrArgChange: true,
   });
+  const [search, setSearch] = useState('');
+  const [userPage, setUserPage] = useState(1);
+  const [conversationPage, setConversationPage] = useState(1);
+  const [loadMoreConversations, {isLoading: isLoadingConversations}] =
+    useLazyLoadMoreConversationsQuery();
+  const [loadMoreUsers, {isLoading: isLoadingMoreUsers}] =
+    useLazyLoadMoreUsersByQueryQuery();
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
 
   useEffect(() => {
@@ -61,46 +74,109 @@ const Home = ({navigation}: HomeParamList) => {
     });
   };
 
-  let content = <></>;
+  const handleLoadMore = () => {
+    if (
+      isLoadingConversations ||
+      isLoadingUsers ||
+      isLoadingMoreUsers ||
+      isLoading
+    ) {
+      return;
+    }
 
-  if (isLoading || isLoadingUsers) {
-    content = (
-      <View className="flex-1 items-center justify-center">
+    const isSearch = state === 'search';
+    const hasMore = isSearch ? data?.hasMore : conversations?.hasMore;
+
+    if (!hasMore) {
+      return null;
+    }
+    if (state === 'search') {
+      if (search.length === 0 || userPage <= 0) {
+        return;
+      }
+
+      const nextUserPage = userPage + 1;
+      loadMoreUsers({query: search, page: nextUserPage});
+      setUserPage(nextUserPage);
+      return;
+    }
+
+    if (conversationPage === 0) {
+      return;
+    }
+
+    const nextConversationPage = conversationPage + 1;
+    loadMoreConversations({page: nextConversationPage, userId: user._id});
+    setConversationPage(nextConversationPage);
+  };
+
+  const triggerQueryUsers = (text: string) => {
+    triggerGetUsers(text);
+    setSearch(text);
+  };
+
+  const loader = () => {
+    const isSearch = state === 'search';
+    const hasMore = isSearch ? data?.hasMore : conversations?.hasMore;
+
+    if (!hasMore) {
+      return null;
+    }
+
+    return (
+      <View className="flex-1 items-center justify-center py-4">
         <ActivityIndicator size="large" color="#7B3FD3" />
       </View>
     );
-  } else {
-    content = (
-      <FlatList
-        key={state}
-        data={state === 'search' ? data : conversations}
-        keyExtractor={item => item._id.toString()}
-        contentContainerClassName="gap-y-1 by-20 px-5"
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={Separator}
-        renderItem={({item}) => {
-          return state === 'search' ? (
-            <UserCard
-              user={item}
-              navigate={(id: string, name: string) => navigateToChat(id, name)}
-            />
-          ) : (
-            <ConversationCard
-              onPress={(name: string) => navigateToChat(item._id, name)}
-              conversation={item}
-            />
-          );
-        }}
-        ListEmptyComponent={emptyList}
-      />
-    );
-  }
+  };
 
   return (
     <SafeAreaView className="bg-white flex-1">
-      <SearchBar triggerGetUsers={triggerGetUsers} changeState={setState} />
+      <SearchBar triggerGetUsers={triggerQueryUsers} changeState={setState} />
 
-      {content}
+      {state === 'search' ? (
+        <FlatList
+          data={data?.data}
+          keyExtractor={item => item._id.toString()}
+          contentContainerClassName="gap-y-1 pb-20 px-5"
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={Separator}
+          ListFooterComponent={loader}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
+          renderItem={({item}) => {
+            return (
+              <UserCard
+                user={item}
+                navigate={(id: string, name: string) =>
+                  navigateToChat(id, name)
+                }
+              />
+            );
+          }}
+          ListEmptyComponent={emptyList}
+        />
+      ) : (
+        <FlatList
+          data={conversations?.data}
+          keyExtractor={item => item._id.toString()}
+          contentContainerClassName="gap-y-1 pb-20 px-5"
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={Separator}
+          ListFooterComponent={loader}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
+          renderItem={({item}) => {
+            return (
+              <ConversationCard
+                onPress={(name: string) => navigateToChat(item._id, name)}
+                conversation={item}
+              />
+            );
+          }}
+          ListEmptyComponent={emptyList}
+        />
+      )}
     </SafeAreaView>
   );
 };

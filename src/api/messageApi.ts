@@ -103,7 +103,15 @@ export const messageApi = baseApi.injectEndpoints({
                 'getMessages',
                 arg.chatId,
                 (draft: Draft<MessageResponse[]>) => {
-                  return [...draft, ...conversations.data];
+                  const newMessages = [...conversations.data];
+                  const isMatchedLastMessage =
+                    draft[draft.length - 1]._id === newMessages[0]._id;
+
+                  if (isMatchedLastMessage) {
+                    newMessages.shift(); // Remove the last message
+                  }
+
+                  return [...draft, ...newMessages];
                 },
               ),
             );

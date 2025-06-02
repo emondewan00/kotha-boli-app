@@ -50,6 +50,14 @@ const Chat = ({navigation, route}: ChatParamList) => {
     setPage(prev => prev + 1);
   };
 
+  const loader = () => {
+    return (
+      <View className="flex flex-row items-center justify-center">
+        <ActivityIndicator size="large" color="#7B3FD3" />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView className="bg-[#7B3FD3] flex-1">
       <View className="flex flex-row gap-x-2 p-4">
@@ -87,11 +95,7 @@ const Chat = ({navigation, route}: ChatParamList) => {
           scrollEnabled
           keyboardShouldPersistTaps="always"
           keyExtractor={item => item._id}
-          ListFooterComponent={() => (
-            <View className="flex-1 items-center justify-center">
-              <ActivityIndicator size="large" color="#7B3FD3" />
-            </View>
-          )}
+          ListFooterComponent={loader}
           onEndReached={loadMore}
           onEndReachedThreshold={0.1}
           renderItem={({item, index}) => {

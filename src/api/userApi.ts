@@ -20,6 +20,15 @@ type LoginResponse = {
   };
 };
 
+type User = {
+  _id: string;
+  email: string;
+  name: string;
+  avatar: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export const userApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
@@ -36,10 +45,34 @@ export const userApi = baseApi.injectEndpoints({
         body: credentials,
       }),
     }),
-    findUsers: builder.query<any, string>({
+    findUsers: builder.query<{data: User[]; hasMore: boolean}, string>({
       query: query => ({url: `/users?search=${query}`}),
     }),
-    findUserById: builder.query<any, string>({
+    loadMoreUsersByQuery: builder.query<
+      {data: User[]; hasMore: boolean},
+      {query: string; page: number}
+    >({
+      query: ({query, page}) => ({
+        url: `/users?search=${query}&page=${page}`,
+      }),
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try {
+          const {data} = await queryFulfilled;
+
+          if (data && data.data.length > 0) {
+            dispatch(
+              userApi.util.updateQueryData('findUsers', arg.query, draft => {
+                draft.data.push(...data.data);
+                draft.hasMore = data.hasMore;
+              }),
+            );
+          }
+        } catch (error) {
+          console.error('Error loading more users:', error);
+        }
+      },
+    }),
+    findUserById: builder.query<User, string>({
       query: id => ({url: `/users/${id}`}),
     }),
   }),
@@ -50,4 +83,5 @@ export const {
   useRegisterMutation,
   useLazyFindUsersQuery,
   useFindUserByIdQuery,
+  useLazyLoadMoreUsersByQueryQuery,
 } = userApi;
