@@ -1,4 +1,10 @@
-import {View, Text, FlatList, ActivityIndicator} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import SearchBar from '../components/SearchBar';
@@ -31,7 +37,11 @@ const Home = ({navigation}: HomeParamList) => {
   const [triggerGetUsers, {data, isLoading: isLoadingUsers}] =
     useLazyFindUsersQuery();
   const user = useAppSelector(selectUser);
-  const {data: conversations, isLoading} = useGetConversationsQuery(user._id, {
+  const {
+    data: conversations,
+    isLoading,
+    refetch,
+  } = useGetConversationsQuery(user._id, {
     refetchOnMountOrArgChange: true,
   });
   const [search, setSearch] = useState('');
@@ -147,6 +157,12 @@ const Home = ({navigation}: HomeParamList) => {
 
       {state === 'search' ? (
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoadingUsers}
+              onRefresh={() => triggerGetUsers(search)}
+            />
+          }
           data={data?.data}
           keyExtractor={item => item._id.toString()}
           contentContainerClassName="gap-y-1 pb-20 px-5"
@@ -171,6 +187,12 @@ const Home = ({navigation}: HomeParamList) => {
         <FlatList
           data={conversations?.data}
           keyExtractor={item => item._id.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoadingConversations}
+              onRefresh={() => refetch()}
+            />
+          }
           contentContainerClassName="gap-y-1 pb-20 px-5"
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={Separator}
