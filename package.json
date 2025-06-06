@@ -10,6 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-firebase/app": "^22.2.0",
+    "@react-native-firebase/messaging": "^22.2.0",
     "@react-native-vector-icons/ant-design": "^4.4.2",
     "@react-native-vector-icons/common": "^11.0.0",
     "@react-native-vector-icons/fontawesome": "^4.7.0",

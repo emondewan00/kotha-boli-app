@@ -4,6 +4,7 @@ import Icon from '@react-native-vector-icons/ionicons';
 import {useAppSelector} from '../hooks/redux';
 import {useCreateMessageMutation} from '../api/messageApi';
 import {selectUser} from '../features/authSlice';
+import {socket} from '../utils/socket';
 
 type Props = {
   conversationId: string;
@@ -13,6 +14,7 @@ const ChatInput: React.FC<Props> = ({conversationId}) => {
   const user = useAppSelector(selectUser);
   const [message, setMessage] = useState('');
   const [createMessage] = useCreateMessageMutation();
+  const typingTimeout = React.useRef<NodeJS.Timeout>(null);
 
   const handleSendMessage = async () => {
     if (!message.trim()) {
@@ -29,6 +31,28 @@ const ChatInput: React.FC<Props> = ({conversationId}) => {
     } catch (error) {}
   };
 
+  // On input change (user starts typing)
+  const handleTyping = (text: string) => {
+    socket.emit('typing', {
+      conversationId,
+      senderId: user._id,
+      senderName: user.name,
+    });
+
+    setMessage(text);
+
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+    }
+
+    typingTimeout.current = setTimeout(() => {
+      socket.emit('stopTyping', {
+        conversationId,
+        senderId: user._id,
+      });
+    }, 2000);
+  };
+
   return (
     <View className="p-4 bg-white">
       <View
@@ -40,7 +64,7 @@ const ChatInput: React.FC<Props> = ({conversationId}) => {
           className="py-4 grow text-slate-700"
           placeholderTextColor="gray"
           value={message}
-          onChangeText={setMessage}
+          onChangeText={handleTyping}
         />
         <TouchableOpacity
           activeOpacity={0.5}

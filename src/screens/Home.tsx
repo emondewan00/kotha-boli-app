@@ -27,6 +27,8 @@ import {
 } from '../api/conversationApi';
 import {socket} from '../utils/socket';
 import Toast from 'react-native-toast-message';
+import {PermissionsAndroid} from 'react-native';
+import messaging from '@react-native-firebase/messaging';
 
 type HomeParamList = CompositeScreenProps<
   NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
@@ -151,6 +153,17 @@ const Home = ({navigation}: HomeParamList) => {
     );
   };
 
+  const fmc = async () => {
+    const result = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+    console.log('result', result);
+  };
+
+  useEffect(() => {
+    fmc();
+    console.log('token', messaging().getToken());
+  }, []);
   return (
     <SafeAreaView className="bg-white flex-1">
       <SearchBar triggerGetUsers={triggerQueryUsers} changeState={setState} />
