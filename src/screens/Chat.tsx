@@ -20,6 +20,7 @@ import {useGetMessagesQuery, messageApi} from '../api/messageApi';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import TypingDots from '../components/TypingDots';
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -32,10 +33,21 @@ const Chat = ({navigation, route}: ChatParamList) => {
   const {data: messages, isLoading} = useGetMessagesQuery(chatId, {
     refetchOnMountOrArgChange: true,
   });
+  const [typing, setTyping] = useState<null | {userName: string}>(null);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     socket.emit('joinRoom', chatId);
+    socket.on('typing', data => {
+      if (data.conversationId === chatId) {
+        setTyping({userName: data.senderName});
+      }
+    });
+    socket.on('stopTyping', data => {
+      if (data.conversationId === chatId) {
+        setTyping(null);
+      }
+    });
     return () => {
       socket.emit('leaveRoom', chatId);
     };
@@ -164,6 +176,8 @@ const Chat = ({navigation, route}: ChatParamList) => {
             );
           }}
         />
+
+        {typing && <TypingDots />}
       </View>
 
       <ChatInput conversationId={chatId} />

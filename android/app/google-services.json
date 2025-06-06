@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "731011895469",
+    "project_id": "kothaboli-a3059",
+    "storage_bucket": "kothaboli-a3059.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731011895469:android:aa011b8d3b5d4483f4b624",
+        "android_client_info": {
+          "package_name": "com.kothaboli"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUFFF2G4jcMZLhn_BHfiFf96Th3O5NE_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
