@@ -27,8 +27,6 @@ import {
 } from '../api/conversationApi';
 import {socket} from '../utils/socket';
 import Toast from 'react-native-toast-message';
-import {PermissionsAndroid} from 'react-native';
-import messaging from '@react-native-firebase/messaging';
 
 type HomeParamList = CompositeScreenProps<
   NativeStackScreenProps<TabNavigatorParamList, 'Home'>,
@@ -54,6 +52,8 @@ const Home = ({navigation}: HomeParamList) => {
   const [loadMoreUsers, {isLoading: isLoadingMoreUsers}] =
     useLazyLoadMoreUsersByQueryQuery();
   const [state, setState] = useState<'conversation' | 'search'>('conversation');
+  const [refreshingConversations, setRefreshingConversations] = useState(false);
+  const [refreshingUsers, setRefreshingUsers] = useState(false);
 
   useEffect(() => {
     socket.on('newConversation', conversationData => {
@@ -153,17 +153,18 @@ const Home = ({navigation}: HomeParamList) => {
     );
   };
 
-  const fmc = async () => {
-    const result = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-    );
-    console.log('result', result);
+  const refreshUsers = () => {
+    setRefreshingUsers(true);
+    triggerGetUsers(search);
+    setRefreshingUsers(false);
   };
 
-  useEffect(() => {
-    fmc();
-    console.log('token', messaging().getToken());
-  }, []);
+  const refreshConversations = () => {
+    setRefreshingConversations(true);
+    refetch();
+    setRefreshingConversations(false);
+  };
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <SearchBar triggerGetUsers={triggerQueryUsers} changeState={setState} />
@@ -172,8 +173,8 @@ const Home = ({navigation}: HomeParamList) => {
         <FlatList
           refreshControl={
             <RefreshControl
-              refreshing={isLoadingUsers}
-              onRefresh={() => triggerGetUsers(search)}
+              refreshing={refreshingUsers}
+              onRefresh={refreshUsers}
             />
           }
           data={data?.data}
@@ -202,8 +203,8 @@ const Home = ({navigation}: HomeParamList) => {
           keyExtractor={item => item._id.toString()}
           refreshControl={
             <RefreshControl
-              refreshing={isLoadingConversations}
-              onRefresh={() => refetch()}
+              refreshing={refreshingConversations}
+              onRefresh={refreshConversations}
             />
           }
           contentContainerClassName="gap-y-1 pb-20 px-5"

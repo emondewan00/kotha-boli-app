@@ -39,7 +39,7 @@ const UserCard: React.FC<Props> = ({user, navigate}) => {
       className="flex flex-row gap-x-2 py-4">
       <Image
         source={userImage}
-        className="h-13 w-13 rounded-full my-auto"
+        className="h-14 w-14 rounded-full my-auto"
         resizeMode="cover"
       />
 
