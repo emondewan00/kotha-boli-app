@@ -75,6 +75,13 @@ export const userApi = baseApi.injectEndpoints({
     findUserById: builder.query<User, string>({
       query: id => ({url: `/users/${id}`}),
     }),
+    updateFcmToken: builder.mutation<{message: string}, string>({
+      query: fcmToken => ({
+        url: '/users/update-fcm-token',
+        method: 'PATCH',
+        body: {fcmToken},
+      }),
+    }),
   }),
 });
 

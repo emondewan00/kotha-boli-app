@@ -46,10 +46,10 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
   return (
     <Pressable
       onPress={() => onPress(name)}
-      className="flex flex-row gap-x-2 py-4">
+      className="flex flex-row gap-x-2 py-4 ">
       <Image
         source={user}
-        className={`h-13 w-13 rounded-full my-auto ${
+        className={`h-14 w-14 rounded-full my-auto ${
           isOnline.includes('online') ? 'border-2 border-green-500' : ''
         }`}
         resizeMode="cover"
