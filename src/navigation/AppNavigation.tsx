@@ -6,11 +6,13 @@ import {selectUser} from '../features/authSlice';
 import {useAppSelector} from '../hooks/redux';
 import {useEffect} from 'react';
 import {socket} from '../utils/socket';
+import useFcmToken from '../hooks/useFcmToken';
 
 const AppStack = createNativeStackNavigator<AppNavigatorParamList>();
 
 const AppNavigator = () => {
   const user = useAppSelector(selectUser);
+  useFcmToken(user._id);
 
   useEffect(() => {
     socket.on('connect', () => {
