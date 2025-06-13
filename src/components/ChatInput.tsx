@@ -13,7 +13,7 @@ type Props = {
 const ChatInput: React.FC<Props> = ({conversationId}) => {
   const user = useAppSelector(selectUser);
   const [message, setMessage] = useState('');
-  const [createMessage] = useCreateMessageMutation();
+  const [createMessage, {isLoading}] = useCreateMessageMutation();
   const typingTimeout = React.useRef<NodeJS.Timeout>(null);
 
   const handleSendMessage = async () => {
@@ -67,6 +67,7 @@ const ChatInput: React.FC<Props> = ({conversationId}) => {
           onChangeText={handleTyping}
         />
         <TouchableOpacity
+          disabled={isLoading}
           activeOpacity={0.5}
           onPress={handleSendMessage}
           className="bg-[#5A0FC8] rounded-full p-2.5">

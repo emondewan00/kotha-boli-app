@@ -6,7 +6,6 @@ import RootNavigator from './src/navigation/RootNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import './src/utils/fireMessage';
-import './src/utils/notifee';
 
 const App = () => {
   return (
