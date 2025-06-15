@@ -63,7 +63,8 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
           numberOfLines={2}
           ellipsizeMode="tail"
           className="text-slate-700 text-sm">
-          {nameOfSender}: {lastMessage?.content || 'No message'}
+          {nameOfSender} {nameOfSender && ': '}
+          {lastMessage?.content || 'No message'}
         </Text>
       </View>
 

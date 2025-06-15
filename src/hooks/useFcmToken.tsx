@@ -1,19 +1,24 @@
 import {useEffect} from 'react';
-import messaging from '@react-native-firebase/messaging';
+import {
+  getToken,
+  getMessaging,
+  onTokenRefresh,
+} from '@react-native-firebase/messaging';
 import {useAppDispatch} from './redux';
 import {userApi} from '../api/userApi';
 
 const useFcmToken = (userId: string) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
+    const messaging = getMessaging();
     const syncToken = async () => {
-      const token = await messaging().getToken();
+      const token = await getToken(messaging);
       dispatch(userApi.endpoints.updateFcmToken.initiate(token));
     };
 
     syncToken();
 
-    const unsubscribe = messaging().onTokenRefresh(token => {
+    const unsubscribe = onTokenRefresh(messaging, token => {
       dispatch(userApi.endpoints.updateFcmToken.initiate(token));
     });
 
