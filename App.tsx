@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message';
 import './src/utils/fireMessage';
 import {createChannelOnce, onMessageReceived} from './src/utils/notifee';
 import {getMessaging, onMessage} from '@react-native-firebase/messaging';
+import Bootsplash from 'react-native-bootsplash';
 
 const App = () => {
   useEffect(() => {
@@ -20,7 +21,7 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
+      <NavigationContainer onReady={() => Bootsplash.hide({fade: true})}>
         <RootNavigator />
       </NavigationContainer>
       <Toast />
