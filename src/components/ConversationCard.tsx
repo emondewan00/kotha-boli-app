@@ -4,27 +4,11 @@ import user from '../assets/user.png';
 import {selectUser} from '../features/authSlice';
 import {useAppSelector} from '../hooks/redux';
 import relativeTime from '../utils/relativeTime';
+import {Conversation} from '../api/conversationApi';
 
 type Props = {
   onPress: (name: string) => void;
-  conversation: {
-    _id: string;
-    name: string;
-    type: 'group' | 'private';
-    image?: string;
-    lastMessage?: {
-      _id: string;
-      content: string;
-      createdAt: string;
-      sender: {
-        _id: string;
-        name: string;
-      };
-    };
-    members: {_id: string; name: string}[];
-    isOnline: string;
-    updatedAt: string;
-  };
+  conversation: Conversation;
 };
 
 const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
@@ -72,7 +56,12 @@ const ConversationCard: React.FC<Props> = ({onPress, conversation}) => {
         <Text className="text-sm text-slate-700">
           {relativeTime(updatedAt)}
         </Text>
-        <Text className="px-1 rounded text-sm bg-[#5A0FC8] text-white">2</Text>
+
+        {conversation.unreadMessageCount ? (
+          <Text className="px-1 rounded text-sm bg-[#5A0FC8] text-white">
+            {conversation.unreadMessageCount || 0}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   );

@@ -58,6 +58,13 @@ export const messageApi = baseApi.injectEndpoints({
             draft.data.unshift(data);
           });
 
+          // update read message .
+          if (data.sender._id !== userId) {
+            dispatch(
+              messageApi.endpoints.updateMessageSeenStatus.initiate(data._id),
+            );
+          }
+
           // Update the conversation list
           dispatch(
             conversationApi.util.updateQueryData(
@@ -80,6 +87,21 @@ export const messageApi = baseApi.injectEndpoints({
 
         try {
           socket.on('message', handleMessage);
+
+          // update unread count
+          dispatch(
+            conversationApi.util.updateQueryData(
+              'getConversations',
+              userId,
+              draft => {
+                const targetConvIndex = draft.data.findIndex(
+                  c => c._id === arg,
+                );
+                draft.data[targetConvIndex].unreadMessageCount = 0;
+              },
+            ),
+          );
+
           await cacheEntryRemoved;
         } catch (err) {
           console.error('onCacheEntryAdded error:', err);
@@ -131,6 +153,13 @@ export const messageApi = baseApi.injectEndpoints({
         url: '/messages',
         method: 'POST',
         body: data,
+      }),
+    }),
+    updateMessageSeenStatus: builder.mutation<MessageResponse, string>({
+      query: id => ({
+        url: '/messages/seen',
+        method: 'PATCH',
+        body: {messageId: id},
       }),
     }),
   }),

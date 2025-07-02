@@ -8,7 +8,7 @@ interface ConversationRequest {
   type: 'private' | 'group';
 }
 
-export type Conversation = ConversationRequest & {
+export type Conversation = Omit<ConversationRequest, 'members'> & {
   _id: string;
   lastMessage?: {
     _id: string;
@@ -23,6 +23,9 @@ export type Conversation = ConversationRequest & {
   isOnline: string;
   updatedAt: string;
   name: string;
+  unreadMessageCount: number;
+  type: 'private' | 'group';
+  image?: string;
 };
 
 export const conversationApi = baseApi.injectEndpoints({
@@ -55,6 +58,10 @@ export const conversationApi = baseApi.injectEndpoints({
               const existingIndex = draft.data.findIndex(
                 c => c._id === data._id,
               );
+              const unreadMessageCount =
+                (draft.data[existingIndex].unreadMessageCount || 0) + 1;
+              data.unreadMessageCount = unreadMessageCount;
+
               if (existingIndex !== -1) {
                 draft.data.splice(existingIndex, 1); // Remove from current position
               }
