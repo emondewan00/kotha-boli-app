@@ -61,6 +61,21 @@ export const conversationApi = baseApi.injectEndpoints({
               draft.data.unshift(data); // Move to top
             });
           });
+
+          // update conversation online status real-time
+          socket.on(
+            'user-status',
+            (data: {conversationId: string; isOnline: string}) => {
+              updateCachedData(draft => {
+                const existingIndex = draft.data.findIndex(
+                  c => c._id === data.conversationId,
+                );
+                if (existingIndex !== -1) {
+                  draft.data[existingIndex].isOnline = data.isOnline;
+                }
+              });
+            },
+          );
         } catch (error) {
           console.error('Error in onCacheEntryAdded:', error);
         }
