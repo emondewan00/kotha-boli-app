@@ -9,6 +9,7 @@ import './src/utils/fireMessage';
 import {createChannelOnce, onMessageReceived} from './src/utils/notifee';
 import {getMessaging, onMessage} from '@react-native-firebase/messaging';
 import Bootsplash from 'react-native-bootsplash';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const App = () => {
   useEffect(() => {
@@ -20,12 +21,14 @@ const App = () => {
   }, []);
 
   return (
-    <Provider store={store}>
-      <NavigationContainer onReady={() => Bootsplash.hide({fade: true})}>
-        <RootNavigator />
-      </NavigationContainer>
-      <Toast />
-    </Provider>
+    <GestureHandlerRootView>
+      <Provider store={store}>
+        <NavigationContainer onReady={() => Bootsplash.hide({fade: true})}>
+          <RootNavigator />
+        </NavigationContainer>
+        <Toast />
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 

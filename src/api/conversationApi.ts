@@ -1,3 +1,4 @@
+import {RootState} from '../store/store';
 import {socket} from '../utils/socket';
 import {baseApi} from './baseApi';
 
@@ -139,6 +140,53 @@ export const conversationApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(
+            conversationApi.util.updateQueryData(
+              'getConversations',
+              arg.members[0],
+              draft => {
+                draft.data.unshift(result.data);
+              },
+            ),
+          );
+        } catch (error) {
+          console.error('Error creating conversation', error);
+        }
+      },
+    }),
+    deleteConversation: builder.mutation<
+      {message: string; success: boolean},
+      string
+    >({
+      query: id => ({
+        url: `/conversations/${id}`,
+        method: 'DELETE',
+      }),
+      async onQueryStarted(arg, {dispatch, queryFulfilled, getState}) {
+        const {auth} = getState() as RootState;
+        try {
+          const result = await queryFulfilled;
+          if (result.data.success) {
+            console.log(result.data.message);
+            dispatch(
+              conversationApi.util.updateQueryData(
+                'getConversations',
+                auth.user?._id || '',
+                draft => {
+                  const filtered = draft.data.filter(c => c._id !== arg);
+                  console.log(filtered);
+                  draft.data = filtered;
+                },
+              ),
+            );
+          }
+        } catch (error) {
+          console.log('Error deleting conversation', error);
+        }
+      },
     }),
   }),
 });
@@ -147,4 +195,5 @@ export const {
   useGetConversationsQuery,
   useCreateConversationMutation,
   useLazyLoadMoreConversationsQuery,
+  useDeleteConversationMutation,
 } = conversationApi;
